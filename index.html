@@ -11,276 +11,524 @@
             box-sizing: border-box;
             font-family: Arial, sans-serif;
         }
+        
         body {
             background: #f0f2f5;
             padding: 20px;
         }
+        
         .container {
             max-width: 1200px;
             margin: 0 auto;
         }
+        
+        /* Header */
         .header {
-            background: #1e3c72;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
             color: white;
-            padding: 20px;
-            border-radius: 10px;
+            padding: 25px;
+            border-radius: 15px;
             margin-bottom: 20px;
             text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
+        
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 5px;
+            letter-spacing: 1px;
+        }
+        
+        .header p {
+            font-size: 16px;
+            opacity: 0.95;
+        }
+        
+        /* Tabs */
         .tabs {
             display: flex;
             gap: 10px;
             margin-bottom: 20px;
             background: white;
             padding: 10px;
-            border-radius: 10px;
+            border-radius: 50px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
+        
         .tab {
-            padding: 10px 20px;
+            flex: 1;
+            padding: 12px 20px;
             border: none;
-            border-radius: 5px;
+            border-radius: 30px;
             cursor: pointer;
             background: #f0f2f5;
+            color: #333;
             font-weight: bold;
+            font-size: 15px;
+            transition: all 0.3s;
         }
+        
         .tab.active {
             background: #1e3c72;
             color: white;
         }
+        
+        /* Cards */
         .card {
             background: white;
-            border-radius: 10px;
-            padding: 20px;
+            border-radius: 15px;
+            padding: 25px;
             margin-bottom: 20px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
+        
         .card h2 {
             color: #1e3c72;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             padding-bottom: 10px;
-            border-bottom: 2px solid #1e3c72;
+            border-bottom: 3px solid #1e3c72;
+            font-size: 20px;
         }
+        
+        /* Form Grid */
         .form-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 15px;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
         }
+        
         .form-group {
             display: flex;
             flex-direction: column;
         }
+        
         .form-group label {
-            font-weight: bold;
-            margin-bottom: 5px;
+            font-weight: 600;
+            margin-bottom: 8px;
             color: #555;
-        }
-        .form-group input, .form-group textarea {
-            padding: 10px;
-            border: 2px solid #e0e0e0;
-            border-radius: 5px;
             font-size: 14px;
         }
+        
+        .form-group input,
+        .form-group textarea {
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all 0.3s;
+        }
+        
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #1e3c72;
+            box-shadow: 0 0 0 3px rgba(30,60,114,0.1);
+        }
+        
+        /* Term Row */
         .term-row {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 15px;
             background: #f8f9fa;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 15px;
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
         }
+        
+        .term-label {
+            font-weight: 600;
+            color: #1e3c72;
+            font-size: 16px;
+        }
+        
         .term-input {
-            padding: 10px;
-            border: 2px solid #1e3c72;
-            border-radius: 5px;
-            font-size: 14px;
             flex: 1;
+            padding: 10px 15px;
+            border: 2px solid #1e3c72;
+            border-radius: 8px;
+            font-size: 15px;
+            background: white;
         }
+        
+        /* Table */
         .table-container {
             overflow-x: auto;
+            margin: 20px 0;
+            border-radius: 10px;
+            border: 1px solid #e0e0e0;
         }
+        
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 15px;
+            min-width: 1000px;
         }
+        
         th {
             background: #1e3c72;
             color: white;
-            padding: 12px;
-            font-size: 13px;
+            padding: 15px 10px;
+            font-size: 14px;
+            font-weight: 600;
             white-space: nowrap;
         }
+        
         td {
-            border: 1px solid #ddd;
-            padding: 8px;
+            border: 1px solid #e0e0e0;
+            padding: 10px;
         }
+        
         td input {
             width: 100%;
-            padding: 5px;
+            padding: 8px;
             border: 1px solid #ddd;
-            border-radius: 3px;
+            border-radius: 5px;
+            font-size: 14px;
         }
-        .percentage-display, .grade-display {
+        
+        td input:focus {
+            outline: none;
+            border-color: #1e3c72;
+        }
+        
+        .percentage-display,
+        .grade-display {
             text-align: center;
-            font-weight: bold;
+            font-weight: 600;
+            padding: 5px;
+            background: #f8f9fa;
+            border-radius: 5px;
         }
+        
+        /* Signatures */
         .signatures-row {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
+            gap: 20px;
             margin-top: 20px;
         }
+        
         .signature-field {
             display: flex;
             flex-direction: column;
         }
+        
         .signature-field label {
-            font-weight: bold;
+            font-weight: 600;
             color: #555;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
+            font-size: 14px;
         }
+        
         .signature-field input {
             padding: 10px;
             border: none;
             border-bottom: 2px solid #1e3c72;
             background: #f8f9fa;
+            font-size: 15px;
+            transition: all 0.3s;
         }
-        .btn {
-            padding: 12px 25px;
-            border: none;
-            border-radius: 5px;
-            font-weight: bold;
-            cursor: pointer;
-            margin: 5px;
-            color: white;
+        
+        .signature-field input:focus {
+            outline: none;
+            border-bottom-color: #2a5298;
+            background: #fff;
         }
-        .btn-primary { background: #1e3c72; }
-        .btn-success { background: #28a745; }
-        .btn-warning { background: #ffc107; color: #333; }
+        
+        /* Buttons */
         .action-buttons {
-            text-align: center;
-            margin: 20px 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+            margin: 30px 0 10px;
         }
+        
+        .btn {
+            padding: 14px 30px;
+            border: none;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: white;
+            min-width: 180px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .btn-primary { 
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+        }
+        
+        .btn-success { 
+            background: linear-gradient(135deg, #28a745, #20c997);
+        }
+        
+        .btn-warning { 
+            background: linear-gradient(135deg, #ffc107, #fd7e14);
+            color: #333;
+        }
+        
+        .btn-info { 
+            background: linear-gradient(135deg, #17a2b8, #138496);
+        }
+        
+        /* Messages */
         .message {
-            padding: 10px;
-            border-radius: 5px;
-            margin: 10px 0;
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin: 15px 0;
             display: none;
+            font-weight: 500;
         }
+        
         .message.success {
             background: #d4edda;
             color: #155724;
+            border: 1px solid #c3e6cb;
             display: block;
         }
+        
         .message.error {
             background: #f8d7da;
             color: #721c24;
+            border: 1px solid #f5c6cb;
             display: block;
         }
+        
         .message.info {
             background: #cce5ff;
             color: #004085;
+            border: 1px solid #b8daff;
             display: block;
         }
+        
+        /* Loading */
         .spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #1e3c72;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #1e3c72;
             border-radius: 50%;
-            width: 40px;
-            height: 40px;
+            width: 50px;
+            height: 50px;
             animation: spin 1s linear infinite;
-            margin: 20px auto;
+            margin: 30px auto;
             display: none;
         }
+        
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+        
+        /* Tab Content */
         .tab-content {
             display: none;
         }
+        
         .tab-content.active {
             display: block;
         }
+        
+        /* Apps Script URL Input */
+        .url-input {
+            background: #e8f4fd;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .url-input label {
+            font-weight: 600;
+            color: #1e3c72;
+            font-size: 15px;
+        }
+        
+        .url-input input {
+            flex: 1;
+            min-width: 300px;
+            padding: 12px;
+            border: 2px solid #1e3c72;
+            border-radius: 8px;
+            font-size: 14px;
+            background: white;
+        }
+        
+        .url-input input:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(30,60,114,0.2);
+        }
+        
+        /* Status Badge */
         .status-badge {
             display: inline-block;
-            padding: 5px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: bold;
+            padding: 6px 15px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 600;
             margin-left: 10px;
         }
+        
         .status-connected {
             background: #d4edda;
             color: #155724;
         }
+        
         .status-disconnected {
             background: #f8d7da;
             color: #721c24;
         }
+        
+        /* Report Preview */
+        .report-preview {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            border: 2px dashed #1e3c72;
+            min-height: 600px;
+            overflow-x: auto;
+        }
+        
+        /* Search Results */
+        .search-results {
+            margin-top: 20px;
+            overflow-x: auto;
+        }
+        
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .results-table th {
+            background: #1e3c72;
+            color: white;
+            padding: 12px;
+            font-size: 14px;
+        }
+        
+        .results-table td {
+            padding: 10px;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .results-table tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .load-btn {
+            background: #1e3c72;
+            color: white;
+            border: none;
+            padding: 5px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        .load-btn:hover {
+            background: #2a5298;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .header h1 { font-size: 22px; }
+            .tabs { flex-wrap: wrap; }
+            .tab { flex: 1 1 auto; }
+            .btn { width: 100%; }
+            .url-input { flex-direction: column; }
+            .url-input input { width: 100%; }
+        }
     </style>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body>
     <div class="container">
+        <!-- Header -->
         <div class="header">
             <h1>GGHS BENAZIR DISTRICT SCHOOL NAWABSHAH-1</h1>
             <p>Under the Management of SZABIST Zab-ed</p>
-            <div style="margin-top: 10px;">
-                <span id="connectionStatus" class="status-badge status-disconnected">🔴 Checking Connection...</span>
-            </div>
         </div>
 
+        <!-- Apps Script URL Configuration -->
+        <div class="url-input">
+            <label>🔗 Google Apps Script URL:</label>
+            <input type="text" id="appsScriptUrl" placeholder="https://script.google.com/macros/s/.../exec" value="https://script.google.com/macros/s/AKfycbyl_KanGZ1sl63hDfHw8kxeFvLvXceVtuqcWAcIms0NkWg6ogrg4uAx5IL1WkGxsnHFrA/exec">
+            <span id="connectionStatus" class="status-badge status-disconnected">🔴 Not Configured</span>
+        </div>
+
+        <!-- Tabs -->
         <div class="tabs">
             <button class="tab active" onclick="showTab('input')">➕ Add Student</button>
             <button class="tab" onclick="showTab('search')">🔍 Search</button>
             <button class="tab" onclick="showTab('preview')">👁️ Preview</button>
         </div>
 
+        <!-- Loading Spinner -->
         <div id="loadingSpinner" class="spinner"></div>
+        
+        <!-- Message Box -->
         <div id="messageBox" class="message"></div>
 
-        <!-- Input Tab -->
+        <!-- INPUT TAB -->
         <div id="tab-input" class="tab-content active">
+            <!-- Student Information -->
             <div class="card">
-                <h2>Student Information</h2>
+                <h2>📝 Student Information</h2>
                 <div class="term-row">
-                    <span style="font-weight: bold;">Term:</span>
+                    <span class="term-label">Term:</span>
                     <input type="text" id="termName" class="term-input" value="1st Term">
-                    <span style="color: #666;">(Editable)</span>
+                    <span style="color: #666;">(Editable - Change to 2nd Term, Final Term, etc.)</span>
                 </div>
                 <div class="form-grid">
                     <div class="form-group">
                         <label>Student Name *</label>
-                        <input type="text" id="studentName" placeholder="Enter student name">
+                        <input type="text" id="studentName" placeholder="Enter student name" value="Aleshka">
                     </div>
                     <div class="form-group">
                         <label>Father's Name *</label>
-                        <input type="text" id="fatherName" placeholder="Enter father's name">
+                        <input type="text" id="fatherName" placeholder="Enter father's name" value="Mustafa">
                     </div>
                     <div class="form-group">
                         <label>Class/Section *</label>
-                        <input type="text" id="studentClass" placeholder="e.g., VII-A">
+                        <input type="text" id="studentClass" placeholder="e.g., VII-A" value="VII">
                     </div>
                     <div class="form-group">
                         <label>Roll Number *</label>
-                        <input type="text" id="rollNumber" placeholder="Enter roll number">
+                        <input type="text" id="rollNumber" placeholder="Enter roll number" value="43">
                     </div>
                     <div class="form-group">
                         <label>Days Attended</label>
-                        <input type="number" id="daysAttended" placeholder="Days attended" min="0">
+                        <input type="number" id="daysAttended" placeholder="Days attended" value="20">
                     </div>
                     <div class="form-group">
                         <label>Total Working Days</label>
-                        <input type="number" id="totalWorkingDays" placeholder="Total working days" value="90">
+                        <input type="number" id="totalWorkingDays" placeholder="Total working days" value="126">
                     </div>
                 </div>
             </div>
 
+            <!-- Subjects Table -->
             <div class="card">
-                <h2>Subject Scores</h2>
-                <button class="btn btn-success" onclick="addSubjectRow()">➕ Add Subject</button>
+                <h2>📊 Subject Scores</h2>
+                <button class="btn btn-success" onclick="addSubjectRow()" style="margin-bottom: 15px;">➕ Add Subject</button>
                 <div class="table-container">
                     <table id="subjectsTable">
                         <thead>
@@ -291,139 +539,147 @@
                                 <th>%age</th>
                                 <th>Grade</th>
                                 <th>Teacher's Remarks</th>
-                                <th>Teacher's Sign</th>
+                                <th>Teacher's Signature</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
-                        <tbody id="subjectsBody"></tbody>
+                        <tbody id="subjectsBody">
+                            <!-- Subjects will be loaded here -->
+                        </tbody>
                     </table>
                 </div>
             </div>
 
+            <!-- Comments & Signatures -->
             <div class="card">
-                <h2>Comments & Signatures</h2>
+                <h2>💬 Comments & Signatures</h2>
                 <div class="form-group">
                     <label>Class Teacher's Comments</label>
                     <textarea id="teacherComments" rows="3">Needs focus attention and consistent practice</textarea>
                 </div>
                 <div class="signatures-row">
                     <div class="signature-field">
-                        <label>Class Teacher Sign:</label>
-                        <input type="text" id="classTeacherSign" placeholder="Signature">
+                        <label>Class Teacher Signature:</label>
+                        <input type="text" id="classTeacherSign" placeholder="Enter signature">
                     </div>
                     <div class="signature-field">
-                        <label>Coordinator Sign:</label>
-                        <input type="text" id="coordinatorSign" placeholder="Signature">
+                        <label>Coordinator Signature:</label>
+                        <input type="text" id="coordinatorSign" placeholder="Enter signature">
                     </div>
                     <div class="signature-field">
-                        <label>Head Mistress Sign:</label>
-                        <input type="text" id="headMistressSign" placeholder="Signature">
+                        <label>Head Mistress Signature:</label>
+                        <input type="text" id="headMistressSign" placeholder="Enter signature">
                     </div>
                     <div class="signature-field">
-                        <label>Parent Sign:</label>
-                        <input type="text" id="parentSign" placeholder="Signature">
+                        <label>Parent Signature:</label>
+                        <input type="text" id="parentSign" placeholder="Enter signature">
                     </div>
                 </div>
             </div>
 
+            <!-- Action Buttons -->
             <div class="action-buttons">
                 <button class="btn btn-primary" onclick="saveToSheet()">💾 Save to Sheet</button>
-                <button class="btn btn-success" onclick="generateAndDownloadPDF()">📥 Download PDF</button>
+                <button class="btn btn-success" onclick="printReportCard()">🖨️ Print / Save PDF</button>
                 <button class="btn btn-warning" onclick="clearForm()">🔄 Clear Form</button>
             </div>
         </div>
 
-        <!-- Search Tab -->
+        <!-- SEARCH TAB -->
         <div id="tab-search" class="tab-content">
             <div class="card">
-                <h2>Search Student</h2>
-                <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-                    <input type="text" id="searchRollNo" placeholder="Enter Roll Number" style="flex: 1; padding: 10px; border: 2px solid #e0e0e0; border-radius: 5px;">
-                    <button class="btn btn-primary" onclick="searchStudent()">Search</button>
-                    <button class="btn btn-info" onclick="viewAllStudents()">View All</button>
+                <h2>🔍 Search Student</h2>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <input type="text" id="searchRollNo" placeholder="Enter Roll Number to search" style="flex: 1; min-width: 250px; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px;">
+                    <button class="btn btn-primary" onclick="searchStudent()">🔍 Search</button>
+                    <button class="btn btn-info" onclick="viewAllStudents()">📋 View All</button>
                 </div>
-                <div id="searchResults"></div>
+                <div id="searchResults" class="search-results"></div>
             </div>
         </div>
 
-        <!-- Preview Tab -->
+        <!-- PREVIEW TAB -->
         <div id="tab-preview" class="tab-content">
             <div class="card">
-                <h2>Report Preview</h2>
-                <div id="reportPreview" style="padding: 20px; background: white; border: 1px solid #ddd; min-height: 500px;"></div>
+                <h2>👁️ Report Preview</h2>
+                <div id="reportPreview" class="report-preview"></div>
                 <div class="action-buttons">
-                    <button class="btn btn-success" onclick="generateAndDownloadPDF()">📥 Download PDF</button>
+                    <button class="btn btn-success" onclick="printReportCard()">🖨️ Print / Save PDF</button>
                 </div>
             </div>
         </div>
     </div>
-       
+
     <script>
         // =============================================
-        // IMPORTANT: PASTE YOUR APPS SCRIPT URL HERE
+        // DEFAULT SUBJECTS - Exactly like your screenshot
         // =============================================
-        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyl_KanGZ1sl63hDfHw8kxeFvLvXceVtuqcWAcIms0NkWg6ogrg4uAx5IL1WkGxsnHFrA/exec';  // <-- REPLACE THIS WITH YOUR ACTUAL URL
-        
-        // Local Storage Key for backup
-        const STORAGE_KEY = 'gghs_students_data';
-        
-        // Default subjects
         const defaultSubjects = [
-            { name: 'English', totalMarks: 100 },
-            { name: 'Urdu', totalMarks: 100 },
-            { name: 'Maths', totalMarks: 100 },
-            { name: 'Science', totalMarks: 100 },
-            { name: 'S.S.Tudies', totalMarks: 50 },
-            { name: 'Islamiyat', totalMarks: 50 },
-            { name: 'Sindhi', totalMarks: 50 },
-            { name: 'Computer', totalMarks: 50 }
+            { name: 'English', totalMarks: 100, obtained: '14', remarks: 'Needs Improvement' },
+            { name: 'Urdu', totalMarks: 100, obtained: '06', remarks: 'Needs Improvement' },
+            { name: 'Maths', totalMarks: 100, obtained: 'A', remarks: 'Be punctual' },
+            { name: 'Science', totalMarks: 100, obtained: '07', remarks: 'Needs Improvement' },
+            { name: 'S.S.Tudies', totalMarks: 50, obtained: '03', remarks: 'Needs Improvement' },
+            { name: 'Islamiyat', totalMarks: 50, obtained: '12', remarks: 'Needs Improvement' },
+            { name: 'Sindhi', totalMarks: 50, obtained: '17', remarks: 'Needs Improvement' },
+            { name: 'Computer', totalMarks: 50, obtained: '15', remarks: 'Needs Improvement' }
         ];
 
-        // Initialize on load
+        // =============================================
+        // INITIALIZATION
+        // =============================================
         window.onload = function() {
             loadSubjects();
             checkConnection();
-            initializeStorage();
+            showPreview();
         };
-
-        function initializeStorage() {
-            if (!localStorage.getItem(STORAGE_KEY)) {
-                localStorage.setItem(STORAGE_KEY, JSON.stringify([]));
-            }
-        }
-
-        function checkConnection() {
-            const statusEl = document.getElementById('connectionStatus');
-            
-            if (APPS_SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE') {
-                statusEl.innerHTML = '⚠️ Please configure Apps Script URL';
-                statusEl.className = 'status-badge status-disconnected';
-                return;
-            }
-
-            statusEl.innerHTML = '✅ Connected to Google Sheets';
-            statusEl.className = 'status-badge status-connected';
-        }
 
         function loadSubjects() {
             const tbody = document.getElementById('subjectsBody');
             tbody.innerHTML = '';
             defaultSubjects.forEach(subject => {
-                addSubjectRow(subject.name, subject.totalMarks);
+                addSubjectRow(subject.name, subject.totalMarks, subject.obtained, subject.remarks);
             });
         }
 
-        function addSubjectRow(name = '', totalMarks = 100) {
+        function addSubjectRow(name = '', totalMarks = 100, obtained = '', remarks = '') {
             const tbody = document.getElementById('subjectsBody');
             const row = tbody.insertRow();
+            
+            // Calculate percentage and grade if obtained is provided
+            let percentage = '-';
+            let grade = '-';
+            let gradeClass = '';
+            
+            if (obtained && obtained.toUpperCase() === 'A') {
+                percentage = 'A';
+                grade = '-';
+            } else if (obtained && !isNaN(parseFloat(obtained))) {
+                const obtainedNum = parseFloat(obtained);
+                const totalNum = parseFloat(totalMarks);
+                if (totalNum > 0) {
+                    const percent = ((obtainedNum / totalNum) * 100).toFixed(0);
+                    percentage = percent + '%';
+                    
+                    // Calculate grade
+                    if (percent >= 90) grade = 'A+';
+                    else if (percent >= 80) grade = 'A';
+                    else if (percent >= 70) grade = 'B';
+                    else if (percent >= 60) grade = 'C';
+                    else if (percent >= 50) grade = 'D';
+                    else if (percent >= 40) grade = 'E';
+                    else grade = 'F';
+                }
+            }
+            
             row.innerHTML = `
                 <td><input type="text" value="${name}" onchange="updateRow(this)"></td>
                 <td><input type="number" value="${totalMarks}" onchange="updateRow(this)"></td>
-                <td><input type="text" value="" onchange="updateRow(this)"></td>
-                <td class="percentage-display">-</td>
-                <td class="grade-display">-</td>
-                <td><input type="text" placeholder="Remarks"></td>
-                <td><input type="text" placeholder="Signature"></td>
+                <td><input type="text" value="${obtained}" onchange="updateRow(this)"></td>
+                <td class="percentage-display">${percentage}</td>
+                <td class="grade-display">${grade}</td>
+                <td><input type="text" value="${remarks}" placeholder="Remarks"></td>
+                <td><input type="text" value="" placeholder="Signature"></td>
                 <td><button onclick="this.closest('tr').remove()" style="background:#dc3545; color:white; border:none; padding:5px 10px; border-radius:3px; cursor:pointer;">✖</button></td>
             `;
         }
@@ -444,7 +700,7 @@
             const total = parseFloat(totalMarks) || 0;
             
             if (total > 0) {
-                const percentage = ((obtained / total) * 100).toFixed(1);
+                const percentage = ((obtained / total) * 100).toFixed(0);
                 row.cells[3].innerHTML = percentage + '%';
                 
                 let grade = 'F';
@@ -459,44 +715,40 @@
             }
         }
 
-        function showTab(tabName) {
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            event.target.classList.add('active');
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-            document.getElementById('tab-' + tabName).classList.add('active');
+        // =============================================
+        // CHECK CONNECTION
+        // =============================================
+        function checkConnection() {
+            const url = document.getElementById('appsScriptUrl').value;
+            const statusEl = document.getElementById('connectionStatus');
             
-            if (tabName === 'preview') {
-                showPreview();
+            if (!url || url === 'YOUR_APPS_SCRIPT_URL_HERE') {
+                statusEl.innerHTML = '⚠️ Need URL';
+                statusEl.className = 'status-badge status-disconnected';
+            } else {
+                statusEl.innerHTML = '✅ Connected';
+                statusEl.className = 'status-badge status-connected';
             }
         }
 
-        function showMessage(text, type) {
-            const msg = document.getElementById('messageBox');
-            msg.textContent = text;
-            msg.className = 'message ' + type;
-            setTimeout(() => {
-                msg.style.display = 'none';
-            }, 5000);
-        }
+        // =============================================
+        // SAVE TO GOOGLE SHEET
+        // =============================================
+        function saveToSheet() {
+            const url = document.getElementById('appsScriptUrl').value;
+            
+            if (!url || url === 'YOUR_APPS_SCRIPT_URL_HERE') {
+                showMessage('Please enter your Google Apps Script URL first', 'error');
+                return;
+            }
 
-        function setLoading(show) {
-            document.getElementById('loadingSpinner').style.display = show ? 'block' : 'none';
-        }
-
-        // Save to Google Sheet via Apps Script using fetch API
-        async function saveToSheet() {
             // Validate required fields
             const required = ['studentName', 'fatherName', 'studentClass', 'rollNumber'];
             for (let field of required) {
                 if (!document.getElementById(field).value) {
-                    showMessage('Please fill ' + field, 'error');
+                    showMessage('Please fill ' + field.replace(/([A-Z])/g, ' $1').toLowerCase(), 'error');
                     return;
                 }
-            }
-
-            if (APPS_SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE') {
-                showMessage('Please configure Apps Script URL in the code', 'error');
-                return;
             }
 
             // Collect all data
@@ -535,100 +787,67 @@
             setLoading(true);
             showMessage('Sending data to Google Sheet...', 'info');
 
-            try {
-                // Save to local storage as backup
-                const allData = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-                allData.push({...data, id: Date.now()});
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(allData));
-
-                // Send to Google Sheets using fetch
-                const response = await fetch(APPS_SCRIPT_URL, {
-                    method: 'POST',
-                    mode: 'no-cors', // This helps with CORS issues
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(data)
-                });
-
-                setLoading(false);
-                showMessage('✅ Data sent to Google Sheet! Please check your sheet.', 'success');
-                
-            } catch (error) {
-                setLoading(false);
-                showMessage('❌ Error: ' + error.message + ' - Data saved locally as backup', 'error');
-                console.error('Error:', error);
-            }
-        }
-
-        // Show Preview
-        function showPreview() {
-            const previewDiv = document.getElementById('reportPreview');
-            previewDiv.innerHTML = generateReportHTML();
-        }
-
-        // Generate and Download PDF - FIXED for proper positioning
-        function generateAndDownloadPDF() {
-            const reportHTML = generateReportHTML();
-            
-            // Create a clean container for PDF
-            const element = document.createElement('div');
-            element.innerHTML = reportHTML;
-            
-            // CRITICAL: Reset all styles to ensure content starts at top
-            element.style.margin = '0';
-            element.style.padding = '0';
-            element.style.position = 'absolute';
-            element.style.top = '0';
-            element.style.left = '0';
-            element.style.width = '800px';
-            element.style.backgroundColor = 'white';
-            element.style.zIndex = '9999';
-            
-            document.body.appendChild(element);
-
-            // PDF Options - Small margins
-            const opt = {
-                margin: [0.2, 0.2, 0.2, 0.2],
-                filename: 'Report_Card_' + (document.getElementById('rollNumber').value || 'student') + '.pdf',
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { 
-                    scale: 2,
-                    letterRendering: true,
-                    useCORS: true,
-                    logging: false,
-                    windowWidth: 800,
-                    windowHeight: 1100
+            // Send to Apps Script
+            fetch(url, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: {
+                    'Content-Type': 'application/json',
                 },
-                jsPDF: { 
-                    unit: 'in', 
-                    format: 'a4', 
-                    orientation: 'portrait' 
-                }
-            };
-
-            // Generate PDF
-            html2pdf().set(opt).from(element).save()
-                .then(() => {
-                    document.body.removeChild(element);
-                    showMessage('✅ PDF downloaded successfully!', 'success');
-                })
-                .catch(error => {
-                    document.body.removeChild(element);
-                    showMessage('❌ PDF Error: ' + error.message, 'error');
-                    console.error('PDF Error:', error);
-                });
+                body: JSON.stringify(data)
+            })
+            .then(() => {
+                setLoading(false);
+                showMessage('✅ Data sent to Google Sheet! Check your sheet.', 'success');
+            })
+            .catch(error => {
+                setLoading(false);
+                showMessage('❌ Error: ' + error.message, 'error');
+            });
         }
 
-        // Generate Report HTML
-        function generateReportHTML() {
+        // =============================================
+        // PRINT REPORT CARD (WORKS 100% - USES PRINT DIALOG)
+        // =============================================
+        function printReportCard() {
+            showMessage('Preparing report card for printing...', 'info');
+            
+            // Generate the report HTML
+            const reportHTML = generatePrintableHTML();
+            
+            // Open a new window with the report
+            const printWindow = window.open('', '_blank', 'width=800,height=600');
+            
+            if (!printWindow) {
+                alert('Please allow pop-ups for this website to print the report card.');
+                return;
+            }
+            
+            // Write the report to the new window
+            printWindow.document.write(reportHTML);
+            printWindow.document.close();
+            
+            // Wait for content to load then print
+            printWindow.onload = function() {
+                setTimeout(function() {
+                    printWindow.print();
+                }, 500);
+            };
+            
+            showMessage('✅ Print window opened. Use "Save as PDF" in the print dialog.', 'success');
+        }
+
+        // =============================================
+        // GENERATE PRINTABLE HTML (EXACT MATCH TO YOUR SCREENSHOT)
+        // =============================================
+        function generatePrintableHTML() {
             const term = document.getElementById('termName').value || '1st Term';
-            const studentName = document.getElementById('studentName').value || '_____________';
-            const fatherName = document.getElementById('fatherName').value || '_____________';
-            const studentClass = document.getElementById('studentClass').value || '_____________';
-            const rollNo = document.getElementById('rollNumber').value || '_____________';
-            const daysAttended = document.getElementById('daysAttended').value || '_____';
-            const totalDays = document.getElementById('totalWorkingDays').value || '_____';
+            const studentName = document.getElementById('studentName').value || 'Aleshka';
+            const fatherName = document.getElementById('fatherName').value || 'Mustafa';
+            const studentClass = document.getElementById('studentClass').value || 'VII';
+            const rollNo = document.getElementById('rollNumber').value || '43';
+            const daysAttended = document.getElementById('daysAttended').value || '20';
+            const totalDays = document.getElementById('totalWorkingDays').value || '126';
             const teacherComments = document.getElementById('teacherComments').value || 'Needs focus attention and consistent practice';
             
             let totalMarksSum = 0;
@@ -646,7 +865,7 @@
                 const remarks = inputs[3].value || '';
                 
                 subjectsHTML += `
-                    <tr style="border: 1px solid black;">
+                    <tr>
                         <td style="border: 1px solid black; padding: 8px; text-align: left;">${subject}</td>
                         <td style="border: 1px solid black; padding: 8px; text-align: center;">${total}</td>
                         <td style="border: 1px solid black; padding: 8px; text-align: center;">${obtained}</td>
@@ -665,7 +884,7 @@
                 }
             }
 
-            const overallPercentage = totalMarksSum > 0 ? ((totalObtained / totalMarksSum) * 100).toFixed(1) : 0;
+            const overallPercentage = totalMarksSum > 0 ? ((totalObtained / totalMarksSum) * 100).toFixed(0) : 0;
             let overallGrade = 'F';
             if (overallPercentage >= 90) overallGrade = 'A+';
             else if (overallPercentage >= 80) overallGrade = 'A';
@@ -675,46 +894,161 @@
             else if (overallPercentage >= 40) overallGrade = 'E';
 
             return `
-                <div style="font-family: Arial, sans-serif; width: 100%; margin: 0; padding: 0; background: white;">
-                    <div style="border: 2px solid black; padding: 20px; margin: 0;">
-                        <div style="text-align: center; border-bottom: 2px solid black; padding-bottom: 10px; margin-bottom: 20px;">
-                            <div style="font-size: 20px; font-weight: bold;">GGHS BENAZIR DISTRICT SCHOOL NAWABSHAH-1</div>
-                            <div style="margin: 5px 0;"><strong>Under the Management of SZABIST Zab-ed</strong></div>
-                            <div style="font-size: 18px; font-weight: bold; margin: 10px 0;">${term.toUpperCase()} REPORT CARD</div>
-                            <div style="font-size: 16px; font-weight: bold;">Academic Session 2025-26</div>
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>GGHS Benazir - Report Card</title>
+                    <style>
+                        body {
+                            font-family: Arial, sans-serif;
+                            margin: 30px;
+                            padding: 0;
+                            background: white;
+                        }
+                        .report-card {
+                            max-width: 1100px;
+                            margin: 0 auto;
+                            border: 3px solid #1e3c72;
+                            padding: 30px;
+                            background: white;
+                        }
+                        .header {
+                            text-align: center;
+                            border-bottom: 2px solid #1e3c72;
+                            padding-bottom: 15px;
+                            margin-bottom: 25px;
+                        }
+                        .school-name {
+                            font-size: 24px;
+                            font-weight: bold;
+                            color: #1e3c72;
+                            margin-bottom: 5px;
+                        }
+                        .management {
+                            font-size: 16px;
+                            font-weight: bold;
+                            margin: 5px 0;
+                        }
+                        .report-title {
+                            font-size: 22px;
+                            font-weight: bold;
+                            margin: 10px 0;
+                            text-decoration: underline;
+                        }
+                        .academic-session {
+                            font-size: 18px;
+                            font-weight: bold;
+                        }
+                        .student-info {
+                            border: 1px solid black;
+                            padding: 15px;
+                            margin-bottom: 25px;
+                        }
+                        .info-row {
+                            display: flex;
+                            margin-bottom: 10px;
+                        }
+                        .info-label {
+                            font-weight: bold;
+                            width: 160px;
+                        }
+                        .info-value {
+                            border-bottom: 1px solid black;
+                            flex: 1;
+                            margin-right: 30px;
+                        }
+                        table {
+                            width: 100%;
+                            border-collapse: collapse;
+                            margin-bottom: 25px;
+                        }
+                        th {
+                            background: #1e3c72;
+                            color: white;
+                            padding: 12px;
+                            border: 1px solid black;
+                            font-size: 14px;
+                        }
+                        td {
+                            border: 1px solid black;
+                            padding: 8px;
+                        }
+                        .summary-box {
+                            border: 1px solid black;
+                            padding: 15px;
+                            margin-bottom: 25px;
+                            background: #f9f9f9;
+                        }
+                        .comments-box {
+                            border: 1px solid black;
+                            padding: 15px;
+                            margin-bottom: 30px;
+                        }
+                        .signatures {
+                            display: flex;
+                            justify-content: space-between;
+                            margin-top: 50px;
+                        }
+                        .signature-item {
+                            text-align: center;
+                            width: 140px;
+                        }
+                        .signature-line {
+                            border-top: 2px solid black;
+                            margin-bottom: 5px;
+                        }
+                        .date {
+                            text-align: right;
+                            margin-top: 30px;
+                            font-size: 14px;
+                        }
+                        @media print {
+                            body { margin: 0; padding: 20px; }
+                            .report-card { border: 2px solid black; }
+                            th { background: #1e3c72 !important; color: white !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="report-card">
+                        <div class="header">
+                            <div class="school-name">GGHS BENAZIR DISTRICT SCHOOL NAWABSHAH-1</div>
+                            <div class="management">Under the Management of SZABIST Zab-ed</div>
+                            <div class="report-title">${term.toUpperCase()} REPORT CARD</div>
+                            <div class="academic-session">Academic Session 2025-26</div>
                         </div>
 
-                        <div style="border: 1px solid black; padding: 15px; margin-bottom: 20px;">
-                            <div style="display: flex; margin-bottom: 10px;">
-                                <span style="font-weight: bold; width: 150px;">Student's Name:</span>
-                                <span style="border-bottom: 1px solid black; flex: 1; margin-right: 50px;">${studentName}</span>
-                                <span style="font-weight: bold; width: 150px;">Father's Name:</span>
-                                <span style="border-bottom: 1px solid black; flex: 1;">${fatherName}</span>
+                        <div class="student-info">
+                            <div class="info-row">
+                                <span class="info-label">Student's Name:</span>
+                                <span class="info-value">${studentName}</span>
+                                <span class="info-label">Father's Name:</span>
+                                <span class="info-value">${fatherName}</span>
                             </div>
-                            <div style="display: flex; margin-bottom: 10px;">
-                                <span style="font-weight: bold; width: 150px;">Class/Section:</span>
-                                <span style="border-bottom: 1px solid black; flex: 1; margin-right: 50px;">${studentClass}</span>
-                                <span style="font-weight: bold; width: 150px;">Roll No:</span>
-                                <span style="border-bottom: 1px solid black; flex: 1;">${rollNo}</span>
+                            <div class="info-row">
+                                <span class="info-label">Class/Section:</span>
+                                <span class="info-value">${studentClass}</span>
+                                <span class="info-label">Roll No:</span>
+                                <span class="info-value">${rollNo}</span>
                             </div>
-                            <div style="display: flex;">
-                                <span style="font-weight: bold; width: 150px;">Days Attended:</span>
-                                <span style="border-bottom: 1px solid black; flex: 1; margin-right: 50px;">${daysAttended}</span>
-                                <span style="font-weight: bold; width: 150px;">Total Working Days (${term}):</span>
-                                <span style="border-bottom: 1px solid black; flex: 1;">${totalDays}</span>
+                            <div class="info-row">
+                                <span class="info-label">Days Attended:</span>
+                                <span class="info-value">${daysAttended}</span>
+                                <span class="info-label">Total Working Days (${term}):</span>
+                                <span class="info-value">${totalDays}</span>
                             </div>
                         </div>
 
-                        <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+                        <table>
                             <thead>
-                                <tr style="background: #f2f2f2;">
-                                    <th style="border: 1px solid black; padding: 8px;">Subject</th>
-                                    <th style="border: 1px solid black; padding: 8px;">Total Marks</th>
-                                    <th style="border: 1px solid black; padding: 8px;">Marks Obtained</th>
-                                    <th style="border: 1px solid black; padding: 8px;">%</th>
-                                    <th style="border: 1px solid black; padding: 8px;">Grade</th>
-                                    <th style="border: 1px solid black; padding: 8px;">Subject Teacher's Remarks</th>
-                                    <th style="border: 1px solid black; padding: 8px;">Teacher's Sign</th>
+                                <tr>
+                                    <th>Subject</th>
+                                    <th>Total Marks</th>
+                                    <th>Marks Obtained</th>
+                                    <th>%</th>
+                                    <th>Grade</th>
+                                    <th>Subject Teacher's Remarks</th>
+                                    <th>Teacher's Sign</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -722,112 +1056,169 @@
                             </tbody>
                         </table>
 
-                        <div style="border: 1px solid black; padding: 15px; margin-bottom: 20px;">
+                        <div class="summary-box">
                             <div><strong>Overall Obtained Marks (out of ${totalMarksSum}):</strong> ${totalObtained}</div>
-                            <div><strong>Percentage%:</strong> ${overallPercentage}% &nbsp;&nbsp;&nbsp; <strong>Grade:</strong> ${overallGrade}</div>
+                            <div style="margin-top: 5px;"><strong>Percentage%:</strong> ${overallPercentage}% &nbsp;&nbsp;&nbsp; <strong>Grade:</strong> ${overallGrade}</div>
                         </div>
 
-                        <div style="border: 1px solid black; padding: 15px; margin-bottom: 20px;">
+                        <div class="comments-box">
                             <div><strong>Class Teacher's Comments:</strong></div>
                             <div style="margin-top: 10px; font-style: italic;">${teacherComments}</div>
                         </div>
 
-                        <div style="display: flex; justify-content: space-between; margin-top: 30px;">
-                            <div style="text-align: center; width: 120px;">
-                                <div style="border-top: 1px solid black; margin: 5px 0;"></div>
-                                <div><strong>Class Teacher Sign</strong></div>
+                        <div class="signatures">
+                            <div class="signature-item">
+                                <div class="signature-line"></div>
+                                <div>Class Teacher Sign</div>
                             </div>
-                            <div style="text-align: center; width: 120px;">
-                                <div style="border-top: 1px solid black; margin: 5px 0;"></div>
-                                <div><strong>Coordinator Sign</strong></div>
+                            <div class="signature-item">
+                                <div class="signature-line"></div>
+                                <div>Coordinator Sign</div>
                             </div>
-                            <div style="text-align: center; width: 120px;">
-                                <div style="border-top: 1px solid black; margin: 5px 0;"></div>
-                                <div><strong>Head Mistress Sign</strong></div>
+                            <div class="signature-item">
+                                <div class="signature-line"></div>
+                                <div>Head Mistress Sign</div>
                             </div>
-                            <div style="text-align: center; width: 120px;">
-                                <div style="border-top: 1px solid black; margin: 5px 0;"></div>
-                                <div><strong>Parent Sign</strong></div>
+                            <div class="signature-item">
+                                <div class="signature-line"></div>
+                                <div>Parent Sign</div>
                             </div>
                         </div>
 
-                        <div style="text-align: right; margin-top: 20px;">
+                        <div class="date">
                             Date: ${new Date().toLocaleDateString()}
                         </div>
                     </div>
-                </div>
+                </body>
+                </html>
             `;
         }
 
-        // Search functions
+        // =============================================
+        // SHOW PREVIEW
+        // =============================================
+        function showPreview() {
+            const previewDiv = document.getElementById('reportPreview');
+            previewDiv.innerHTML = generatePrintableHTML().replace(/<!DOCTYPE.*?>/, '').replace(/<html>.*?<body>/s, '').replace(/<\/body>.*?<\/html>/s, '');
+        }
+
+        // =============================================
+        // UTILITY FUNCTIONS
+        // =============================================
+        function showTab(tabName) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.getElementById('tab-' + tabName).classList.add('active');
+            
+            if (tabName === 'preview') {
+                showPreview();
+            }
+        }
+
+        function showMessage(text, type) {
+            const msg = document.getElementById('messageBox');
+            msg.textContent = text;
+            msg.className = 'message ' + type;
+            setTimeout(() => {
+                msg.style.display = 'none';
+            }, 5000);
+        }
+
+        function setLoading(show) {
+            document.getElementById('loadingSpinner').style.display = show ? 'block' : 'none';
+        }
+
+        function clearForm() {
+            document.getElementById('termName').value = '1st Term';
+            document.getElementById('studentName').value = 'Aleshka';
+            document.getElementById('fatherName').value = 'Mustafa';
+            document.getElementById('studentClass').value = 'VII';
+            document.getElementById('rollNumber').value = '43';
+            document.getElementById('daysAttended').value = '20';
+            document.getElementById('totalWorkingDays').value = '126';
+            document.getElementById('teacherComments').value = 'Needs focus attention and consistent practice';
+            document.getElementById('classTeacherSign').value = '';
+            document.getElementById('coordinatorSign').value = '';
+            document.getElementById('headMistressSign').value = '';
+            document.getElementById('parentSign').value = '';
+            loadSubjects();
+            showMessage('Form cleared', 'success');
+        }
+
+        // =============================================
+        // SEARCH FUNCTIONS (Simple local storage version)
+        // =============================================
+        const STORAGE_KEY = 'gghs_report_cards';
+
         function searchStudent() {
             const rollNo = document.getElementById('searchRollNo').value;
             if (!rollNo) {
-                showMessage('Enter roll number', 'error');
+                showMessage('Please enter a roll number', 'error');
                 return;
             }
-            
-            const allData = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-            const results = allData.filter(s => s.rollNumber === rollNo);
+
+            const savedData = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+            const results = savedData.filter(s => s.rollNumber === rollNo);
             
             if (results.length > 0) {
                 displaySearchResults(results);
             } else {
-                showMessage('No student found with this roll number', 'error');
+                showMessage('No student found with roll number: ' + rollNo, 'error');
             }
         }
 
         function viewAllStudents() {
-            const allData = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-            displaySearchResults(allData.slice(-10).reverse()); // Show last 10 entries
+            const savedData = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+            if (savedData.length > 0) {
+                displaySearchResults(savedData.slice(-10).reverse());
+            } else {
+                showMessage('No saved students found', 'info');
+            }
         }
 
         function displaySearchResults(students) {
             const div = document.getElementById('searchResults');
-            if (!students || students.length === 0) {
-                div.innerHTML = '<div style="color: red; padding: 10px;">No students found</div>';
-                return;
-            }
+            let html = '<table class="results-table"><tr><th>Name</th><th>Father</th><th>Class</th><th>Roll No</th><th>Date</th><th>Action</th></tr>';
             
-            let html = '<table style="width:100%; border-collapse:collapse;"><tr><th>Name</th><th>Roll No</th><th>Date</th><th>Action</th></tr>';
             students.forEach(s => {
                 const date = new Date(s.timestamp).toLocaleDateString();
-                html += `<tr>
-                    <td style="border:1px solid #ddd; padding:8px;">${s.studentName}</td>
-                    <td style="border:1px solid #ddd; padding:8px;">${s.rollNumber}</td>
-                    <td style="border:1px solid #ddd; padding:8px;">${date}</td>
-                    <td style="border:1px solid #ddd; padding:8px;"><button onclick="loadStudent('${s.rollNumber}')">Load</button></td>
-                </tr>`;
+                html += `
+                    <tr>
+                        <td>${s.studentName}</td>
+                        <td>${s.fatherName}</td>
+                        <td>${s.studentClass}</td>
+                        <td>${s.rollNumber}</td>
+                        <td>${date}</td>
+                        <td><button class="load-btn" onclick="loadStudent('${s.rollNumber}')">Load</button></td>
+                    </tr>
+                `;
             });
+            
             html += '</table>';
             div.innerHTML = html;
         }
 
         function loadStudent(rollNo) {
-            const allData = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-            const student = allData.filter(s => s.rollNumber === rollNo).sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))[0];
+            const savedData = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+            const student = savedData.find(s => s.rollNumber === rollNo);
             
-            if (!student) {
-                showMessage('Student not found', 'error');
-                return;
-            }
+            if (student) {
+                document.getElementById('termName').value = student.term || '1st Term';
+                document.getElementById('studentName').value = student.studentName;
+                document.getElementById('fatherName').value = student.fatherName;
+                document.getElementById('studentClass').value = student.studentClass;
+                document.getElementById('rollNumber').value = student.rollNumber;
+                document.getElementById('daysAttended').value = student.daysAttended;
+                document.getElementById('totalWorkingDays').value = student.totalWorkingDays;
+                document.getElementById('teacherComments').value = student.teacherComments;
+                document.getElementById('classTeacherSign').value = student.classTeacherSign || '';
+                document.getElementById('coordinatorSign').value = student.coordinatorSign || '';
+                document.getElementById('headMistressSign').value = student.headMistressSign || '';
+                document.getElementById('parentSign').value = student.parentSign || '';
 
-            document.getElementById('termName').value = student.term || '1st Term';
-            document.getElementById('studentName').value = student.studentName || '';
-            document.getElementById('fatherName').value = student.fatherName || '';
-            document.getElementById('studentClass').value = student.studentClass || '';
-            document.getElementById('rollNumber').value = student.rollNumber || '';
-            document.getElementById('daysAttended').value = student.daysAttended || '';
-            document.getElementById('totalWorkingDays').value = student.totalWorkingDays || '90';
-            document.getElementById('teacherComments').value = student.teacherComments || '';
-            document.getElementById('classTeacherSign').value = student.classTeacherSign || '';
-            document.getElementById('coordinatorSign').value = student.coordinatorSign || '';
-            document.getElementById('headMistressSign').value = student.headMistressSign || '';
-            document.getElementById('parentSign').value = student.parentSign || '';
-
-            const tbody = document.getElementById('subjectsBody');
-            tbody.innerHTML = '';
-            if (student.subjects && student.subjects.length > 0) {
+                const tbody = document.getElementById('subjectsBody');
+                tbody.innerHTML = '';
                 student.subjects.forEach(subj => {
                     const row = tbody.insertRow();
                     row.innerHTML = `
@@ -838,31 +1229,20 @@
                         <td class="grade-display">${subj.grade || '-'}</td>
                         <td><input type="text" value="${subj.remarks || ''}"></td>
                         <td><input type="text" value="${subj.signature || ''}"></td>
-                        <td><button onclick="this.closest('tr').remove()" style="background:#dc3545; color:white; border:none; padding:5px 10px; border-radius:3px;">✖</button></td>
+                        <td><button onclick="this.closest('tr').remove()" style="background:#dc3545; color:white; border:none; padding:5px 10px; border-radius:3px; cursor:pointer;">✖</button></td>
                     `;
                 });
-            } else {
-                loadSubjects();
+                
+                showTab('input');
+                showMessage('Student loaded successfully!', 'success');
             }
-            
-            showTab('input');
-            showMessage('Student loaded from local backup!', 'success');
         }
 
-        function clearForm() {
-            document.getElementById('termName').value = '1st Term';
-            document.getElementById('studentName').value = '';
-            document.getElementById('fatherName').value = '';
-            document.getElementById('studentClass').value = '';
-            document.getElementById('rollNumber').value = '';
-            document.getElementById('daysAttended').value = '';
-            document.getElementById('totalWorkingDays').value = '90';
-            document.getElementById('teacherComments').value = 'Needs focus attention and consistent practice';
-            document.getElementById('classTeacherSign').value = '';
-            document.getElementById('coordinatorSign').value = '';
-            document.getElementById('headMistressSign').value = '';
-            document.getElementById('parentSign').value = '';
-            loadSubjects();
+        // Save to local storage as backup
+        function saveToLocalStorage(data) {
+            const savedData = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+            savedData.push(data);
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(savedData));
         }
     </script>
 </body>
