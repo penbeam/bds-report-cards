@@ -1,0 +1,1122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>GGHS Benazir - Report Card System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+        }
+
+        body {
+            background: #f0f2f5;
+            min-height: 100vh;
+            padding: 10px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .app-header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .app-header h1 {
+            font-size: clamp(18px, 5vw, 24px);
+            margin-bottom: 5px;
+        }
+
+        .app-header p {
+            font-size: clamp(12px, 4vw, 14px);
+            opacity: 0.9;
+        }
+
+        .tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-bottom: 15px;
+            background: white;
+            padding: 10px;
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .tab {
+            flex: 1 1 auto;
+            min-width: 100px;
+            padding: 12px 8px;
+            border: none;
+            border-radius: 8px;
+            background: #f8f9fa;
+            color: #333;
+            font-size: clamp(12px, 4vw, 14px);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .tab.active {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .card-title {
+            font-size: clamp(16px, 5vw, 18px);
+            color: #1e3c72;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #1e3c72;
+            font-weight: 600;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        @media (min-width: 640px) {
+            .form-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .form-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .form-group label {
+            font-size: clamp(12px, 4vw, 14px);
+            font-weight: 600;
+            color: #555;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: clamp(14px, 4vw, 16px);
+            transition: border-color 0.3s;
+            width: 100%;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #1e3c72;
+        }
+
+        .term-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .term-label {
+            font-weight: 600;
+            color: #1e3c72;
+            font-size: clamp(14px, 4vw, 16px);
+        }
+
+        .term-input {
+            flex: 1;
+            min-width: 150px;
+            padding: 10px;
+            border: 2px solid #1e3c72;
+            border-radius: 8px;
+            font-size: clamp(14px, 4vw, 16px);
+            background: white;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin: 15px -15px;
+            padding: 0 15px;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .subjects-table {
+            width: 100%;
+            min-width: 900px;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .subjects-table th {
+            background: #1e3c72;
+            color: white;
+            padding: 12px 8px;
+            font-size: clamp(11px, 3vw, 13px);
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .subjects-table td {
+            padding: 10px 5px;
+            border: 1px solid #e0e0e0;
+            text-align: center;
+        }
+
+        .subjects-table input {
+            width: 100%;
+            min-width: 70px;
+            padding: 8px 4px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: clamp(11px, 3vw, 13px);
+            text-align: center;
+        }
+
+        .percentage-display,
+        .grade-display {
+            font-weight: 600;
+            padding: 4px;
+            border-radius: 4px;
+        }
+
+        .signatures-row {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        @media (min-width: 640px) {
+            .signatures-row {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .signatures-row {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        .signature-field {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .signature-field label {
+            font-weight: 600;
+            color: #555;
+            font-size: clamp(12px, 4vw, 14px);
+        }
+
+        .signature-field input {
+            padding: 10px;
+            border: none;
+            border-bottom: 2px solid #1e3c72;
+            background: #f8f9fa;
+            font-size: clamp(13px, 4vw, 15px);
+            border-radius: 4px 4px 0 0;
+        }
+
+        .action-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .btn {
+            flex: 1 1 auto;
+            min-width: 140px;
+            padding: 14px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: clamp(14px, 4vw, 16px);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: white;
+            text-align: center;
+        }
+
+        .btn-primary { background: linear-gradient(135deg, #1e3c72, #2a5298); }
+        .btn-success { background: linear-gradient(135deg, #28a745, #20c997); }
+        .btn-warning { background: linear-gradient(135deg, #ffc107, #fd7e14); }
+        .btn-info { background: linear-gradient(135deg, #17a2b8, #138496); }
+        .btn-danger { background: linear-gradient(135deg, #dc3545, #c82333); }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .message {
+            padding: 12px;
+            border-radius: 8px;
+            margin: 10px 0;
+            display: none;
+            font-size: clamp(13px, 4vw, 15px);
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            display: block;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            display: block;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #1e3c72;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+            display: none;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .search-results {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .students-table {
+            width: 100%;
+            min-width: 600px;
+            border-collapse: collapse;
+        }
+
+        .students-table th {
+            background: #1e3c72;
+            color: white;
+            padding: 12px;
+            font-size: clamp(12px, 4vw, 14px);
+        }
+
+        .students-table td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            font-size: clamp(11px, 4vw, 13px);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .storage-indicator {
+            background: #e8f4fd;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .storage-indicator span {
+            font-weight: 600;
+            color: #1e3c72;
+        }
+
+        .data-actions {
+            display: flex;
+            gap: 10px;
+            margin-left: auto;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="app-header">
+            <h1>📚 GGHS Benazir District School</h1>
+            <p>Under the Management of SZABIST Zab-ed</p>
+        </div>
+
+        <!-- Storage Indicator for GitHub Version -->
+        <div class="storage-indicator">
+            <span>💾 Using Browser Local Storage</span>
+            <div class="data-actions">
+                <button class="btn btn-sm btn-info" onclick="exportData()" style="padding: 8px 15px; font-size: 12px;">📤 Export Data</button>
+                <button class="btn btn-sm btn-warning" onclick="importData()" style="padding: 8px 15px; font-size: 12px;">📥 Import Data</button>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('input')">➕ Add Student</button>
+            <button class="tab" onclick="showTab('search')">🔍 Search</button>
+            <button class="tab" onclick="showTab('preview')">👁️ Preview</button>
+        </div>
+
+        <div id="loadingSpinner" class="spinner"></div>
+        <div id="messageBox" class="message"></div>
+
+        <!-- TAB 1: INPUT FORM -->
+        <div id="tab-input" class="tab-content active">
+            <div class="card">
+                <h2 class="card-title">📝 Student Information</h2>
+                
+                <div class="term-row">
+                    <span class="term-label">Term:</span>
+                    <input type="text" id="termName" class="term-input" value="1st Term" placeholder="e.g., 1st Term, 2nd Term, Final Term">
+                    <span class="term-label">(Editable)</span>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Student Name *</label>
+                        <input type="text" id="studentName" placeholder="Enter student name">
+                    </div>
+                    <div class="form-group">
+                        <label>Father's Name *</label>
+                        <input type="text" id="fatherName" placeholder="Enter father's name">
+                    </div>
+                    <div class="form-group">
+                        <label>Class/Section *</label>
+                        <input type="text" id="studentClass" placeholder="e.g., VII-A">
+                    </div>
+                    <div class="form-group">
+                        <label>Roll Number *</label>
+                        <input type="text" id="rollNumber" placeholder="Enter roll number">
+                    </div>
+                    <div class="form-group">
+                        <label>Days Attended</label>
+                        <input type="number" id="daysAttended" placeholder="Days attended" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Total Working Days</label>
+                        <input type="number" id="totalWorkingDays" placeholder="Total working days" value="90">
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2 class="card-title">📊 Subject Scores</h2>
+                <button class="btn btn-success" onclick="addSubjectRow()" style="margin-bottom: 15px;">➕ Add Subject</button>
+
+                <div class="table-container">
+                    <table class="subjects-table" id="subjectsTable">
+                        <thead>
+                            <tr>
+                                <th>Subject</th>
+                                <th>Total Marks</th>
+                                <th>Marks Obtained</th>
+                                <th>%age</th>
+                                <th>Grade</th>
+                                <th>Teacher's Remarks</th>
+                                <th>Teacher's Sign</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="subjectsBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2 class="card-title">💬 Comments & Signatures</h2>
+                
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <label>Class Teacher's Comments</label>
+                    <textarea id="teacherComments" rows="3" placeholder="Enter comments...">Needs focus attention and consistent practice</textarea>
+                </div>
+
+                <div class="signatures-row">
+                    <div class="signature-field">
+                        <label>Class Teacher Sign:</label>
+                        <input type="text" id="classTeacherSign" placeholder="Signature">
+                    </div>
+                    <div class="signature-field">
+                        <label>Coordinator Sign:</label>
+                        <input type="text" id="coordinatorSign" placeholder="Signature">
+                    </div>
+                    <div class="signature-field">
+                        <label>Head Mistress Sign:</label>
+                        <input type="text" id="headMistressSign" placeholder="Signature">
+                    </div>
+                    <div class="signature-field">
+                        <label>Parent Sign:</label>
+                        <input type="text" id="parentSign" placeholder="Signature">
+                    </div>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn btn-primary" onclick="saveStudent()">💾 Save Locally</button>
+                <button class="btn btn-success" onclick="generateAndDownloadPDF()">📥 Download PDF</button>
+                <button class="btn btn-warning" onclick="clearForm()">🔄 Clear Form</button>
+            </div>
+        </div>
+
+        <!-- TAB 2: SEARCH -->
+        <div id="tab-search" class="tab-content">
+            <div class="card">
+                <h2 class="card-title">🔍 Search Student</h2>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <input type="text" id="searchRollNo" placeholder="Enter Roll Number" style="flex: 1; min-width: 200px; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px;">
+                    <button class="btn btn-primary" onclick="searchStudent()" style="flex: 0 1 auto;">Search</button>
+                    <button class="btn btn-info" onclick="viewAllStudents()">View All</button>
+                </div>
+                <div id="searchResults" class="search-results" style="margin-top: 20px;"></div>
+            </div>
+        </div>
+
+        <!-- TAB 3: PREVIEW -->
+        <div id="tab-preview" class="tab-content">
+            <div class="card">
+                <h2 class="card-title">👁️ Report Preview</h2>
+                <div id="reportPreview" style="min-height: 400px; background: white; padding: 15px; border-radius: 8px;"></div>
+                <div class="action-buttons" style="margin-top: 20px;">
+                    <button class="btn btn-primary" onclick="generateAndDownloadPDF()">📥 Download PDF</button>
+                    <button class="btn btn-success" onclick="window.print()">🖨️ Print</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Local Storage Key
+        const STORAGE_KEY = 'gghs_students_data';
+        
+        // Default subjects
+        const defaultSubjects = [
+            { name: 'English', totalMarks: 100 },
+            { name: 'Urdu', totalMarks: 100 },
+            { name: 'Maths', totalMarks: 100 },
+            { name: 'Science', totalMarks: 100 },
+            { name: 'S.S.Tudies', totalMarks: 50 },
+            { name: 'Islamiyat', totalMarks: 50 },
+            { name: 'Sindhi', totalMarks: 50 },
+            { name: 'Computer', totalMarks: 50 }
+        ];
+
+        // Initialize
+        window.onload = function() {
+            loadSubjects();
+            initializeStorage();
+        };
+
+        function initializeStorage() {
+            if (!localStorage.getItem(STORAGE_KEY)) {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify([]));
+            }
+        }
+
+        function loadSubjects() {
+            const tbody = document.getElementById('subjectsBody');
+            tbody.innerHTML = '';
+            defaultSubjects.forEach(subject => {
+                addSubjectRow(subject.name, subject.totalMarks);
+            });
+        }
+
+        function addSubjectRow(name = '', totalMarks = 100) {
+            const tbody = document.getElementById('subjectsBody');
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td><input type="text" value="${name}" placeholder="Subject" onchange="updateRow(this)"></td>
+                <td><input type="number" value="${totalMarks}" min="0" onchange="updateRow(this)"></td>
+                <td><input type="text" value="" placeholder="Marks" onchange="updateRow(this)"></td>
+                <td class="percentage-display">-</td>
+                <td class="grade-display">-</td>
+                <td><input type="text" placeholder="Remarks"></td>
+                <td><input type="text" placeholder="Signature"></td>
+                <td><button class="btn" style="padding:5px 10px; background:#dc3545; color:white;" onclick="this.closest('tr').remove()">✖</button></td>
+            `;
+            tbody.appendChild(row);
+        }
+
+        function updateRow(input) {
+            const row = input.closest('tr');
+            const inputs = row.querySelectorAll('input');
+            const marksObtained = inputs[2].value;
+            const totalMarks = inputs[1].value;
+
+            if (marksObtained.toString().toUpperCase() === 'A') {
+                row.querySelector('.percentage-display').textContent = 'A';
+                row.querySelector('.grade-display').textContent = '-';
+                return;
+            }
+
+            const obtained = parseFloat(marksObtained) || 0;
+            const total = parseFloat(totalMarks) || 0;
+            
+            if (total > 0) {
+                const percentage = ((obtained / total) * 100).toFixed(1);
+                row.querySelector('.percentage-display').textContent = percentage + '%';
+                
+                let grade = '';
+                if (percentage >= 90) grade = 'A+';
+                else if (percentage >= 80) grade = 'A';
+                else if (percentage >= 70) grade = 'B';
+                else if (percentage >= 60) grade = 'C';
+                else if (percentage >= 50) grade = 'D';
+                else if (percentage >= 40) grade = 'E';
+                else grade = 'F';
+                
+                row.querySelector('.grade-display').textContent = grade;
+            }
+        }
+
+        function showTab(tabName) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+        }
+
+        function showMessage(text, type) {
+            const msg = document.getElementById('messageBox');
+            msg.textContent = text;
+            msg.className = `message ${type}`;
+            setTimeout(() => msg.style.display = 'none', 5000);
+        }
+
+        function setLoading(show) {
+            document.getElementById('loadingSpinner').style.display = show ? 'block' : 'none';
+        }
+
+        // Save to Local Storage
+        function saveStudent() {
+            const required = ['studentName', 'fatherName', 'studentClass', 'rollNumber'];
+            for (let field of required) {
+                if (!document.getElementById(field).value) {
+                    showMessage(`Please fill ${field}`, 'error');
+                    return;
+                }
+            }
+
+            const data = {
+                id: Date.now(),
+                term: document.getElementById('termName').value,
+                studentName: document.getElementById('studentName').value,
+                fatherName: document.getElementById('fatherName').value,
+                studentClass: document.getElementById('studentClass').value,
+                rollNumber: document.getElementById('rollNumber').value,
+                daysAttended: document.getElementById('daysAttended').value,
+                totalWorkingDays: document.getElementById('totalWorkingDays').value,
+                teacherComments: document.getElementById('teacherComments').value,
+                classTeacherSign: document.getElementById('classTeacherSign').value,
+                coordinatorSign: document.getElementById('coordinatorSign').value,
+                headMistressSign: document.getElementById('headMistressSign').value,
+                parentSign: document.getElementById('parentSign').value,
+                timestamp: new Date().toISOString(),
+                subjects: []
+            };
+
+            document.querySelectorAll('#subjectsBody tr').forEach(row => {
+                const inputs = row.querySelectorAll('input');
+                data.subjects.push({
+                    name: inputs[0].value,
+                    totalMarks: inputs[1].value,
+                    marksObtained: inputs[2].value,
+                    percentage: row.querySelector('.percentage-display').textContent,
+                    grade: row.querySelector('.grade-display').textContent,
+                    remarks: inputs[3].value,
+                    signature: inputs[4].value
+                });
+            });
+
+            // Save to local storage
+            const allData = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+            allData.push(data);
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(allData));
+
+            showMessage('Student data saved locally!', 'success');
+        }
+
+        // Search in Local Storage
+        function searchStudent() {
+            const rollNo = document.getElementById('searchRollNo').value;
+            if (!rollNo) {
+                showMessage('Enter roll number', 'error');
+                return;
+            }
+
+            setLoading(true);
+            
+            const allData = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+            const results = allData.filter(s => s.rollNumber === rollNo);
+            
+            setTimeout(() => {
+                setLoading(false);
+                displaySearchResults(results);
+            }, 500);
+        }
+
+        function viewAllStudents() {
+            setLoading(true);
+            
+            const allData = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+            
+            setTimeout(() => {
+                setLoading(false);
+                displayAllStudents(allData);
+            }, 500);
+        }
+
+        function displaySearchResults(students) {
+            const div = document.getElementById('searchResults');
+            if (!students || students.length === 0) {
+                div.innerHTML = '<div class="message error">No students found</div>';
+                return;
+            }
+            
+            let html = '<table class="students-table"><tr><th>Name</th><th>Father</th><th>Class</th><th>Roll No</th><th>Date</th><th>Action</th></tr>';
+            students.forEach(s => {
+                const date = new Date(s.timestamp).toLocaleDateString();
+                html += `<tr>
+                    <td>${s.studentName}</td>
+                    <td>${s.fatherName}</td>
+                    <td>${s.studentClass}</td>
+                    <td>${s.rollNumber}</td>
+                    <td>${date}</td>
+                    <td><button class="btn" style="padding:5px 10px;" onclick="loadStudent('${s.rollNumber}')">Load</button></td>
+                </tr>`;
+            });
+            html += '</table>';
+            div.innerHTML = html;
+        }
+
+        function displayAllStudents(students) {
+            const div = document.getElementById('searchResults');
+            if (!students || students.length === 0) {
+                div.innerHTML = '<div class="message error">No students found</div>';
+                return;
+            }
+            
+            let html = '<table class="students-table"><tr><th>Name</th><th>Father</th><th>Class</th><th>Roll No</th><th>Date</th><th>Action</th></tr>';
+            students.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)).forEach(s => {
+                const date = new Date(s.timestamp).toLocaleDateString();
+                html += `<tr>
+                    <td>${s.studentName}</td>
+                    <td>${s.fatherName}</td>
+                    <td>${s.studentClass}</td>
+                    <td>${s.rollNumber}</td>
+                    <td>${date}</td>
+                    <td><button class="btn" style="padding:5px 10px;" onclick="loadStudent('${s.rollNumber}')">Load</button></td>
+                </tr>`;
+            });
+            html += '</table>';
+            div.innerHTML = html;
+        }
+
+        function loadStudent(rollNo) {
+            setLoading(true);
+            
+            const allData = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+            const student = allData.filter(s => s.rollNumber === rollNo).sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))[0];
+            
+            setTimeout(() => {
+                setLoading(false);
+                
+                if (!student) {
+                    showMessage('Student not found', 'error');
+                    return;
+                }
+
+                document.getElementById('termName').value = student.term || '1st Term';
+                document.getElementById('studentName').value = student.studentName || '';
+                document.getElementById('fatherName').value = student.fatherName || '';
+                document.getElementById('studentClass').value = student.studentClass || '';
+                document.getElementById('rollNumber').value = student.rollNumber || '';
+                document.getElementById('daysAttended').value = student.daysAttended || '';
+                document.getElementById('totalWorkingDays').value = student.totalWorkingDays || '90';
+                document.getElementById('teacherComments').value = student.teacherComments || '';
+                document.getElementById('classTeacherSign').value = student.classTeacherSign || '';
+                document.getElementById('coordinatorSign').value = student.coordinatorSign || '';
+                document.getElementById('headMistressSign').value = student.headMistressSign || '';
+                document.getElementById('parentSign').value = student.parentSign || '';
+
+                const tbody = document.getElementById('subjectsBody');
+                tbody.innerHTML = '';
+                if (student.subjects && student.subjects.length > 0) {
+                    student.subjects.forEach(subj => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td><input type="text" value="${subj.name}"></td>
+                            <td><input type="number" value="${subj.totalMarks}" min="0"></td>
+                            <td><input type="text" value="${subj.marksObtained}"></td>
+                            <td class="percentage-display">${subj.percentage || '-'}</td>
+                            <td class="grade-display">${subj.grade || '-'}</td>
+                            <td><input type="text" value="${subj.remarks || ''}"></td>
+                            <td><input type="text" value="${subj.signature || ''}"></td>
+                            <td><button class="btn" style="padding:5px 10px; background:#dc3545; color:white;" onclick="this.closest('tr').remove()">✖</button></td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                } else {
+                    loadSubjects();
+                }
+                
+                showTab('input');
+                showMessage('Student loaded from local storage!', 'success');
+            }, 500);
+        }
+
+        // Generate and Download PDF
+        function generateAndDownloadPDF() {
+            const reportHTML = generateExactReportHTML();
+            
+            const element = document.createElement('div');
+            element.innerHTML = reportHTML;
+            element.style.position = 'absolute';
+            element.style.left = '-9999px';
+            element.style.top = '-9999px';
+            document.body.appendChild(element);
+
+            const opt = {
+                margin:        [0.5, 0.5, 0.5, 0.5],
+                filename:     `Report_Card_${document.getElementById('rollNumber').value || 'student'}.pdf`,
+                image:        { type: 'jpeg', quality: 1 },
+                html2canvas:  { scale: 2, letterRendering: true, useCORS: true, logging: false },
+                jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
+            };
+
+            html2pdf().set(opt).from(element).save().then(() => {
+                document.body.removeChild(element);
+                showMessage('PDF downloaded successfully!', 'success');
+            });
+        }
+
+        function generateExactReportHTML() {
+            const term = document.getElementById('termName').value || '1st Term';
+            const studentName = document.getElementById('studentName').value || '_________';
+            const fatherName = document.getElementById('fatherName').value || '_________';
+            const studentClass = document.getElementById('studentClass').value || '_________';
+            const rollNo = document.getElementById('rollNumber').value || '_________';
+            const daysAttended = document.getElementById('daysAttended').value || '_____';
+            const totalDays = document.getElementById('totalWorkingDays').value || '_____';
+            const teacherComments = document.getElementById('teacherComments').value || 'Needs focus attention and consistent practice';
+            
+            let totalMarksSum = 0;
+            let totalObtained = 0;
+            let subjectsHTML = '';
+
+            document.querySelectorAll('#subjectsBody tr').forEach(row => {
+                const inputs = row.querySelectorAll('input');
+                const subject = inputs[0].value || '______';
+                const total = inputs[1].value || '0';
+                const obtained = inputs[2].value || '0';
+                const percentage = row.querySelector('.percentage-display').textContent;
+                const grade = row.querySelector('.grade-display').textContent;
+                const remarks = inputs[3].value || '';
+                
+                subjectsHTML += `
+                    <tr style="border: 1px solid #000;">
+                        <td style="border: 1px solid #000; padding: 8px; text-align: left;">${subject}</td>
+                        <td style="border: 1px solid #000; padding: 8px; text-align: center;">${total}</td>
+                        <td style="border: 1px solid #000; padding: 8px; text-align: center;">${obtained}</td>
+                        <td style="border: 1px solid #000; padding: 8px; text-align: center;">${percentage}</td>
+                        <td style="border: 1px solid #000; padding: 8px; text-align: center;">${grade}</td>
+                        <td style="border: 1px solid #000; padding: 8px; text-align: left;">${remarks}</td>
+                        <td style="border: 1px solid #000; padding: 8px; text-align: center;"></td>
+                    </tr>
+                `;
+
+                if (obtained.toString().toUpperCase() !== 'A') {
+                    totalMarksSum += parseFloat(total) || 0;
+                    totalObtained += parseFloat(obtained) || 0;
+                } else {
+                    totalMarksSum += parseFloat(total) || 0;
+                }
+            });
+
+            const overallPercentage = totalMarksSum > 0 ? ((totalObtained / totalMarksSum) * 100).toFixed(0) : 0;
+            let overallGrade = 'F';
+            if (overallPercentage >= 90) overallGrade = 'A+';
+            else if (overallPercentage >= 80) overallGrade = 'A';
+            else if (overallPercentage >= 70) overallGrade = 'B';
+            else if (overallPercentage >= 60) overallGrade = 'C';
+            else if (overallPercentage >= 50) overallGrade = 'D';
+            else if (overallPercentage >= 40) overallGrade = 'E';
+
+            return `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="UTF-8">
+                    <style>
+                        body {
+                            font-family: Arial, sans-serif;
+                            margin: 0;
+                            padding: 20px;
+                            background: white;
+                        }
+                        .report-card {
+                            max-width: 800px;
+                            margin: 0 auto;
+                            border: 2px solid #000;
+                            padding: 20px;
+                        }
+                        .header {
+                            text-align: center;
+                            margin-bottom: 20px;
+                            border-bottom: 2px solid #000;
+                            padding-bottom: 10px;
+                        }
+                        .school-name {
+                            font-size: 20px;
+                            font-weight: bold;
+                            text-transform: uppercase;
+                            margin-bottom: 5px;
+                        }
+                        .management {
+                            font-size: 14px;
+                            margin-bottom: 10px;
+                        }
+                        .report-title {
+                            font-size: 18px;
+                            font-weight: bold;
+                            margin: 10px 0;
+                        }
+                        .academic-session {
+                            font-size: 16px;
+                            font-weight: bold;
+                        }
+                        .student-info {
+                            border: 1px solid #000;
+                            padding: 15px;
+                            margin-bottom: 20px;
+                        }
+                        .info-row {
+                            display: flex;
+                            margin-bottom: 10px;
+                        }
+                        .info-label {
+                            font-weight: bold;
+                            width: 150px;
+                        }
+                        .info-value {
+                            border-bottom: 1px solid #000;
+                            min-width: 200px;
+                        }
+                        table {
+                            width: 100%;
+                            border-collapse: collapse;
+                            margin-bottom: 20px;
+                        }
+                        th {
+                            background: #f2f2f2;
+                            border: 1px solid #000;
+                            padding: 8px;
+                            font-size: 12px;
+                            font-weight: bold;
+                            text-align: center;
+                        }
+                        td {
+                            border: 1px solid #000;
+                            padding: 8px;
+                            font-size: 12px;
+                        }
+                        .summary-section {
+                            border: 1px solid #000;
+                            padding: 15px;
+                            margin-bottom: 20px;
+                        }
+                        .comments-section {
+                            border: 1px solid #000;
+                            padding: 15px;
+                            margin-bottom: 20px;
+                        }
+                        .signatures-section {
+                            display: flex;
+                            justify-content: space-between;
+                            margin-top: 30px;
+                        }
+                        .signature-item {
+                            text-align: center;
+                        }
+                        .signature-line {
+                            border-top: 1px solid #000;
+                            width: 120px;
+                            margin: 5px auto;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="report-card">
+                        <div class="header">
+                            <div class="school-name">GGHS BENAZIR DISTRICT SCHOOL NAWABSHAH-1</div>
+                            <div class="management"><strong>Under the Management of SZABIST Zab-ed</strong></div>
+                            <div class="report-title"><strong>${term.toUpperCase()} REPORT CARD</strong></div>
+                            <div class="academic-session"><strong>Academic Session 2025-26</strong></div>
+                        </div>
+
+                        <div class="student-info">
+                            <div class="info-row">
+                                <span class="info-label">Student's Name:</span>
+                                <span class="info-value">${studentName}</span>
+                                <span class="info-label" style="margin-left: 50px;">Father's Name:</span>
+                                <span class="info-value">${fatherName}</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Class/Section:</span>
+                                <span class="info-value">${studentClass}</span>
+                                <span class="info-label" style="margin-left: 50px;">Roll No:</span>
+                                <span class="info-value">${rollNo}</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Days Attended:</span>
+                                <span class="info-value">${daysAttended}</span>
+                                <span class="info-label" style="margin-left: 50px;">Total Working Days (${term}):</span>
+                                <span class="info-value">${totalDays}</span>
+                            </div>
+                        </div>
+
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Subject</th>
+                                    <th>Total Marks</th>
+                                    <th>Marks Obtained</th>
+                                    <th>%</th>
+                                    <th>Grade</th>
+                                    <th>Subject Teacher's Remarks</th>
+                                    <th>Teacher's Sign</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${subjectsHTML}
+                            </tbody>
+                        </table>
+
+                        <div class="summary-section">
+                            <div><strong>Overall Obtained Marks (out of ${totalMarksSum}):</strong> ${totalObtained}</div>
+                            <div><strong>Percentage%:</strong> ${overallPercentage}% &nbsp;&nbsp;&nbsp; <strong>Grade:</strong> ${overallGrade}</div>
+                        </div>
+
+                        <div class="comments-section">
+                            <div><strong>Class Teacher's Comments:</strong></div>
+                            <div style="margin-top: 10px; font-style: italic;">${teacherComments}</div>
+                        </div>
+
+                        <div class="signatures-section">
+                            <div class="signature-item">
+                                <div class="signature-line"></div>
+                                <div><strong>Class Teacher Sign</strong></div>
+                            </div>
+                            <div class="signature-item">
+                                <div class="signature-line"></div>
+                                <div><strong>Coordinator Sign</strong></div>
+                            </div>
+                            <div class="signature-item">
+                                <div class="signature-line"></div>
+                                <div><strong>Head Mistress Sign</strong></div>
+                            </div>
+                            <div class="signature-item">
+                                <div class="signature-line"></div>
+                                <div><strong>Parent Sign</strong></div>
+                            </div>
+                        </div>
+
+                        <div style="text-align: right; margin-top: 20px;">
+                            Date: ${new Date().toLocaleDateString()}
+                        </div>
+                    </div>
+                </body>
+                </html>
+            `;
+        }
+
+        function clearForm() {
+            document.getElementById('termName').value = '1st Term';
+            document.getElementById('studentName').value = '';
+            document.getElementById('fatherName').value = '';
+            document.getElementById('studentClass').value = '';
+            document.getElementById('rollNumber').value = '';
+            document.getElementById('daysAttended').value = '';
+            document.getElementById('totalWorkingDays').value = '90';
+            document.getElementById('teacherComments').value = 'Needs focus attention and consistent practice';
+            document.getElementById('classTeacherSign').value = '';
+            document.getElementById('coordinatorSign').value = '';
+            document.getElementById('headMistressSign').value = '';
+            document.getElementById('parentSign').value = '';
+            loadSubjects();
+        }
+
+        // Export/Import functions for GitHub version
+        function exportData() {
+            const data = localStorage.getItem(STORAGE_KEY);
+            const blob = new Blob([data], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `gghs_backup_${new Date().toISOString().slice(0,10)}.json`;
+            a.click();
+            showMessage('Data exported successfully!', 'success');
+        }
+
+        function importData() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const data = JSON.parse(e.target.result);
+                        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+                        showMessage('Data imported successfully!', 'success');
+                    } catch (err) {
+                        showMessage('Invalid file format', 'error');
+                    }
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+        }
+    </script>
+</body>
+</html>
