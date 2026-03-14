@@ -109,6 +109,7 @@
             color: white;
             padding: 12px;
             font-size: 13px;
+            white-space: nowrap;
         }
         td {
             border: 1px solid #ddd;
@@ -175,6 +176,11 @@
         .message.error {
             background: #f8d7da;
             color: #721c24;
+            display: block;
+        }
+        .message.info {
+            background: #cce5ff;
+            color: #004085;
             display: block;
         }
         .spinner {
@@ -334,6 +340,7 @@
                 <div style="display: flex; gap: 10px; margin-bottom: 20px;">
                     <input type="text" id="searchRollNo" placeholder="Enter Roll Number" style="flex: 1; padding: 10px; border: 2px solid #e0e0e0; border-radius: 5px;">
                     <button class="btn btn-primary" onclick="searchStudent()">Search</button>
+                    <button class="btn btn-info" onclick="viewAllStudents()">View All</button>
                 </div>
                 <div id="searchResults"></div>
             </div>
@@ -357,6 +364,9 @@
         // =============================================
         const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx57W20kM0dSabY4TCbHZxWOfCHceKqFHZfACFPNUgnaGv1aJ1Agx4K2iHD7tPRJj9kdg/exec';  // <-- REPLACE THIS WITH YOUR ACTUAL URL
         
+        // Local Storage Key for backup
+        const STORAGE_KEY = 'gghs_students_data';
+        
         // Default subjects
         const defaultSubjects = [
             { name: 'English', totalMarks: 100 },
@@ -373,7 +383,14 @@
         window.onload = function() {
             loadSubjects();
             checkConnection();
+            initializeStorage();
         };
+
+        function initializeStorage() {
+            if (!localStorage.getItem(STORAGE_KEY)) {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify([]));
+            }
+        }
 
         function checkConnection() {
             const statusEl = document.getElementById('connectionStatus');
@@ -384,7 +401,7 @@
                 return;
             }
 
-            statusEl.innerHTML = '✅ Connected to Sheet';
+            statusEl.innerHTML = '✅ Connected to Google Sheets';
             statusEl.className = 'status-badge status-connected';
         }
 
@@ -466,8 +483,8 @@
             document.getElementById('loadingSpinner').style.display = show ? 'block' : 'none';
         }
 
-        // Save to Google Sheet via Apps Script
-        function saveToSheet() {
+        // Save to Google Sheet via Apps Script using fetch API
+        async function saveToSheet() {
             // Validate required fields
             const required = ['studentName', 'fatherName', 'studentClass', 'rollNumber'];
             for (let field of required) {
@@ -518,42 +535,30 @@
             setLoading(true);
             showMessage('Sending data to Google Sheet...', 'info');
 
-            // Create a form to submit
-            const form = document.createElement('form');
-            form.method = 'POST';
-            form.action = APPS_SCRIPT_URL;
-            form.target = 'hiddenFrame';
-            form.style.display = 'none';
+            try {
+                // Save to local storage as backup
+                const allData = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+                allData.push({...data, id: Date.now()});
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(allData));
 
-            const input = document.createElement('input');
-            input.type = 'hidden';
-            input.name = 'data';
-            input.value = JSON.stringify(data);
-            form.appendChild(input);
+                // Send to Google Sheets using fetch
+                const response = await fetch(APPS_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors', // This helps with CORS issues
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
 
-            const iframe = document.createElement('iframe');
-            iframe.name = 'hiddenFrame';
-            iframe.style.display = 'none';
-            document.body.appendChild(iframe);
-
-            iframe.onload = function() {
                 setLoading(false);
-                showMessage('✅ Data saved to Google Sheet successfully!', 'success');
-                document.body.removeChild(iframe);
-                document.body.removeChild(form);
-            };
-
-            document.body.appendChild(form);
-            form.submit();
-
-            setTimeout(() => {
-                if (document.body.contains(iframe)) {
-                    setLoading(false);
-                    showMessage('✅ Data sent (check your sheet)', 'success');
-                    document.body.removeChild(iframe);
-                    document.body.removeChild(form);
-                }
-            }, 5000);
+                showMessage('✅ Data sent to Google Sheet! Please check your sheet.', 'success');
+                
+            } catch (error) {
+                setLoading(false);
+                showMessage('❌ Error: ' + error.message + ' - Data saved locally as backup', 'error');
+                console.error('Error:', error);
+            }
         }
 
         // Show Preview
@@ -562,29 +567,29 @@
             previewDiv.innerHTML = generateReportHTML();
         }
 
-        // ===== FIXED PDF GENERATION FUNCTION =====
+        // Generate and Download PDF - FIXED for proper positioning
         function generateAndDownloadPDF() {
             const reportHTML = generateReportHTML();
             
-            // Create container with proper styling for PDF
+            // Create a clean container for PDF
             const element = document.createElement('div');
             element.innerHTML = reportHTML;
             
-            // CRITICAL FIX: Reset all margins and padding
+            // CRITICAL: Reset all styles to ensure content starts at top
             element.style.margin = '0';
             element.style.padding = '0';
-            element.style.position = 'relative';
+            element.style.position = 'absolute';
             element.style.top = '0';
             element.style.left = '0';
-            element.style.width = '100%';
+            element.style.width = '800px';
             element.style.backgroundColor = 'white';
+            element.style.zIndex = '9999';
             
-            // Add to body temporarily
             document.body.appendChild(element);
 
-            // PDF Options - Optimized for top-starting position
+            // PDF Options - Small margins
             const opt = {
-                margin: [0.3, 0.3, 0.3, 0.3], // Small margins
+                margin: [0.2, 0.2, 0.2, 0.2],
                 filename: 'Report_Card_' + (document.getElementById('rollNumber').value || 'student') + '.pdf',
                 image: { type: 'jpeg', quality: 0.98 },
                 html2canvas: { 
@@ -598,11 +603,11 @@
                 jsPDF: { 
                     unit: 'in', 
                     format: 'a4', 
-                    orientation: 'portrait'
+                    orientation: 'portrait' 
                 }
             };
 
-            // Generate PDF and remove element
+            // Generate PDF
             html2pdf().set(opt).from(element).save()
                 .then(() => {
                     document.body.removeChild(element);
@@ -615,7 +620,7 @@
                 });
         }
 
-        // Generate Report HTML - FIXED VERSION
+        // Generate Report HTML
         function generateReportHTML() {
             const term = document.getElementById('termName').value || '1st Term';
             const studentName = document.getElementById('studentName').value || '_____________';
@@ -669,10 +674,9 @@
             else if (overallPercentage >= 50) overallGrade = 'D';
             else if (overallPercentage >= 40) overallGrade = 'E';
 
-            // FIXED: Added proper container with no margins
             return `
-                <div style="font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; background: white;">
-                    <div style="border: 2px solid black; padding: 20px;">
+                <div style="font-family: Arial, sans-serif; width: 100%; margin: 0; padding: 0; background: white;">
+                    <div style="border: 2px solid black; padding: 20px; margin: 0;">
                         <div style="text-align: center; border-bottom: 2px solid black; padding-bottom: 10px; margin-bottom: 20px;">
                             <div style="font-size: 20px; font-weight: bold;">GGHS BENAZIR DISTRICT SCHOOL NAWABSHAH-1</div>
                             <div style="margin: 5px 0;"><strong>Under the Management of SZABIST Zab-ed</strong></div>
@@ -755,7 +759,7 @@
             `;
         }
 
-        // Search function
+        // Search functions
         function searchStudent() {
             const rollNo = document.getElementById('searchRollNo').value;
             if (!rollNo) {
@@ -763,7 +767,86 @@
                 return;
             }
             
-            showMessage('Search feature coming soon!', 'info');
+            const allData = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+            const results = allData.filter(s => s.rollNumber === rollNo);
+            
+            if (results.length > 0) {
+                displaySearchResults(results);
+            } else {
+                showMessage('No student found with this roll number', 'error');
+            }
+        }
+
+        function viewAllStudents() {
+            const allData = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+            displaySearchResults(allData.slice(-10).reverse()); // Show last 10 entries
+        }
+
+        function displaySearchResults(students) {
+            const div = document.getElementById('searchResults');
+            if (!students || students.length === 0) {
+                div.innerHTML = '<div style="color: red; padding: 10px;">No students found</div>';
+                return;
+            }
+            
+            let html = '<table style="width:100%; border-collapse:collapse;"><tr><th>Name</th><th>Roll No</th><th>Date</th><th>Action</th></tr>';
+            students.forEach(s => {
+                const date = new Date(s.timestamp).toLocaleDateString();
+                html += `<tr>
+                    <td style="border:1px solid #ddd; padding:8px;">${s.studentName}</td>
+                    <td style="border:1px solid #ddd; padding:8px;">${s.rollNumber}</td>
+                    <td style="border:1px solid #ddd; padding:8px;">${date}</td>
+                    <td style="border:1px solid #ddd; padding:8px;"><button onclick="loadStudent('${s.rollNumber}')">Load</button></td>
+                </tr>`;
+            });
+            html += '</table>';
+            div.innerHTML = html;
+        }
+
+        function loadStudent(rollNo) {
+            const allData = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+            const student = allData.filter(s => s.rollNumber === rollNo).sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))[0];
+            
+            if (!student) {
+                showMessage('Student not found', 'error');
+                return;
+            }
+
+            document.getElementById('termName').value = student.term || '1st Term';
+            document.getElementById('studentName').value = student.studentName || '';
+            document.getElementById('fatherName').value = student.fatherName || '';
+            document.getElementById('studentClass').value = student.studentClass || '';
+            document.getElementById('rollNumber').value = student.rollNumber || '';
+            document.getElementById('daysAttended').value = student.daysAttended || '';
+            document.getElementById('totalWorkingDays').value = student.totalWorkingDays || '90';
+            document.getElementById('teacherComments').value = student.teacherComments || '';
+            document.getElementById('classTeacherSign').value = student.classTeacherSign || '';
+            document.getElementById('coordinatorSign').value = student.coordinatorSign || '';
+            document.getElementById('headMistressSign').value = student.headMistressSign || '';
+            document.getElementById('parentSign').value = student.parentSign || '';
+
+            const tbody = document.getElementById('subjectsBody');
+            tbody.innerHTML = '';
+            if (student.subjects && student.subjects.length > 0) {
+                student.subjects.forEach(subj => {
+                    const row = tbody.insertRow();
+                    row.innerHTML = `
+                        <td><input type="text" value="${subj.name}"></td>
+                        <td><input type="number" value="${subj.totalMarks}"></td>
+                        <td><input type="text" value="${subj.marksObtained}"></td>
+                        <td class="percentage-display">${subj.percentage || '-'}</td>
+                        <td class="grade-display">${subj.grade || '-'}</td>
+                        <td><input type="text" value="${subj.remarks || ''}"></td>
+                        <td><input type="text" value="${subj.signature || ''}"></td>
+                        <td><button onclick="this.closest('tr').remove()" style="background:#dc3545; color:white; border:none; padding:5px 10px; border-radius:3px;">✖</button></td>
+                    `;
+                });
+            } else {
+                loadSubjects();
+            }
+            
+            showTab('input');
+            showMessage('Student loaded from local backup!', 'success');
         }
 
         function clearForm() {
