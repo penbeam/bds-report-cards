@@ -139,6 +139,12 @@
             color: #555;
             margin-bottom: 5px;
         }
+        .signature-field input {
+            padding: 10px;
+            border: none;
+            border-bottom: 2px solid #1e3c72;
+            background: #f8f9fa;
+        }
         .btn {
             padding: 12px 25px;
             border: none;
@@ -191,14 +197,20 @@
         .tab-content.active {
             display: block;
         }
-        .storage-indicator {
+        .apps-script-input {
             background: #e8f4fd;
-            padding: 10px;
-            border-radius: 5px;
+            padding: 15px;
+            border-radius: 8px;
             margin-bottom: 15px;
             display: flex;
-            align-items: center;
             gap: 10px;
+            align-items: center;
+        }
+        .apps-script-input input {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid #1e3c72;
+            border-radius: 5px;
         }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -210,8 +222,11 @@
             <p>Under the Management of SZABIST Zab-ed</p>
         </div>
 
-        <div class="storage-indicator">
-            <span>💾 Using Browser Local Storage</span>
+        <!-- Apps Script Web App URL Input -->
+        <div class="apps-script-input">
+            <span style="font-weight: bold;">🔗 Apps Script URL:</span>
+            <input type="text" id="appsScriptUrl" placeholder="Paste your Google Apps Script Web App URL here" value="https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec">
+            <button class="btn btn-primary" onclick="testConnection()">Test Connection</button>
         </div>
 
         <div class="tabs">
@@ -309,7 +324,7 @@
             </div>
 
             <div class="action-buttons">
-                <button class="btn btn-primary" onclick="saveStudent()">💾 Save Locally</button>
+                <button class="btn btn-primary" onclick="saveToSheet()">💾 Save to Sheet</button>
                 <button class="btn btn-success" onclick="generateAndDownloadPDF()">📥 Download PDF</button>
                 <button class="btn btn-warning" onclick="clearForm()">🔄 Clear Form</button>
             </div>
@@ -322,7 +337,6 @@
                 <div style="display: flex; gap: 10px; margin-bottom: 20px;">
                     <input type="text" id="searchRollNo" placeholder="Enter Roll Number" style="flex: 1; padding: 10px; border: 2px solid #e0e0e0; border-radius: 5px;">
                     <button class="btn btn-primary" onclick="searchStudent()">Search</button>
-                    <button class="btn btn-primary" onclick="viewAllStudents()">View All</button>
                 </div>
                 <div id="searchResults"></div>
             </div>
@@ -332,7 +346,7 @@
         <div id="tab-preview" class="tab-content">
             <div class="card">
                 <h2>Report Preview</h2>
-                <div id="reportPreview" style="padding: 20px; background: white; border: 1px solid #ddd;"></div>
+                <div id="reportPreview" style="padding: 20px; background: white; border: 1px solid #ddd; min-height: 500px;"></div>
                 <div class="action-buttons">
                     <button class="btn btn-success" onclick="generateAndDownloadPDF()">📥 Download PDF</button>
                 </div>
@@ -341,9 +355,6 @@
     </div>
 
     <script>
-        // Local Storage Key
-        const STORAGE_KEY = 'gghs_students_data';
-        
         // Default subjects
         const defaultSubjects = [
             { name: 'English', totalMarks: 100 },
@@ -359,14 +370,7 @@
         // Initialize on load
         window.onload = function() {
             loadSubjects();
-            initializeStorage();
         };
-
-        function initializeStorage() {
-            if (!localStorage.getItem(STORAGE_KEY)) {
-                localStorage.setItem(STORAGE_KEY, JSON.stringify([]));
-            }
-        }
 
         function loadSubjects() {
             const tbody = document.getElementById('subjectsBody');
@@ -439,15 +443,42 @@
             msg.className = 'message ' + type;
             setTimeout(() => {
                 msg.style.display = 'none';
-            }, 3000);
+            }, 5000);
         }
 
         function setLoading(show) {
             document.getElementById('loadingSpinner').style.display = show ? 'block' : 'none';
         }
 
-        // Save to Local Storage
-        function saveStudent() {
+        // Test connection to Apps Script
+        function testConnection() {
+            const url = document.getElementById('appsScriptUrl').value;
+            if (!url) {
+                showMessage('Please enter Apps Script URL', 'error');
+                return;
+            }
+            
+            setLoading(true);
+            
+            // Test by sending a simple ping
+            fetch(url + '?ping=1')
+                .then(response => {
+                    setLoading(false);
+                    if (response.ok) {
+                        showMessage('✅ Connection successful!', 'success');
+                    } else {
+                        showMessage('❌ Connection failed', 'error');
+                    }
+                })
+                .catch(error => {
+                    setLoading(false);
+                    showMessage('❌ Connection error: ' + error.message, 'error');
+                });
+        }
+
+        // Save to Google Sheet via Apps Script
+        function saveToSheet() {
+            // Validate required fields
             const required = ['studentName', 'fatherName', 'studentClass', 'rollNumber'];
             for (let field of required) {
                 if (!document.getElementById(field).value) {
@@ -456,8 +487,14 @@
                 }
             }
 
+            const appsScriptUrl = document.getElementById('appsScriptUrl').value;
+            if (!appsScriptUrl) {
+                showMessage('Please enter your Apps Script URL', 'error');
+                return;
+            }
+
+            // Collect all data
             const data = {
-                id: Date.now(),
                 term: document.getElementById('termName').value,
                 studentName: document.getElementById('studentName').value,
                 fatherName: document.getElementById('fatherName').value,
@@ -474,6 +511,7 @@
                 subjects: []
             };
 
+            // Collect subjects
             const rows = document.getElementById('subjectsBody').rows;
             for (let i = 0; i < rows.length; i++) {
                 const inputs = rows[i].getElementsByTagName('input');
@@ -488,11 +526,26 @@
                 });
             }
 
-            const allData = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-            allData.push(data);
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(allData));
+            setLoading(true);
 
-            showMessage('Student data saved locally!', 'success');
+            // Send to Apps Script using fetch with CORS mode
+            fetch(appsScriptUrl, {
+                method: 'POST',
+                mode: 'no-cors', // This is important for Apps Script
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'data=' + encodeURIComponent(JSON.stringify(data))
+            })
+            .then(() => {
+                setLoading(false);
+                showMessage('✅ Data sent to Google Sheet! Check your sheet.', 'success');
+            })
+            .catch(error => {
+                setLoading(false);
+                showMessage('❌ Error: ' + error.message, 'error');
+                console.error('Error:', error);
+            });
         }
 
         // Show Preview
@@ -501,28 +554,51 @@
             previewDiv.innerHTML = generateReportHTML();
         }
 
-        // Generate PDF
+        // Generate and Download PDF - FIXED VERSION
         function generateAndDownloadPDF() {
             const reportHTML = generateReportHTML();
+            
+            // Create a styled container for PDF
             const element = document.createElement('div');
             element.innerHTML = reportHTML;
-            element.style.position = 'absolute';
-            element.style.left = '-9999px';
-            element.style.top = '-9999px';
+            element.style.width = '800px';
+            element.style.margin = '0 auto';
+            element.style.padding = '20px';
+            element.style.backgroundColor = 'white';
+            element.style.fontFamily = 'Arial, sans-serif';
+            
             document.body.appendChild(element);
 
+            // PDF Options - Optimized for better rendering
             const opt = {
                 margin: [0.5, 0.5, 0.5, 0.5],
                 filename: 'Report_Card_' + (document.getElementById('rollNumber').value || 'student') + '.pdf',
-                image: { type: 'jpeg', quality: 1 },
-                html2canvas: { scale: 2, letterRendering: true },
-                jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { 
+                    scale: 2, 
+                    letterRendering: true,
+                    useCORS: true,
+                    logging: false,
+                    allowTaint: false
+                },
+                jsPDF: { 
+                    unit: 'in', 
+                    format: 'a4', 
+                    orientation: 'portrait' 
+                }
             };
 
-            html2pdf().set(opt).from(element).save().then(() => {
-                document.body.removeChild(element);
-                showMessage('PDF downloaded successfully!', 'success');
-            });
+            // Generate PDF
+            html2pdf().set(opt).from(element).save()
+                .then(() => {
+                    document.body.removeChild(element);
+                    showMessage('✅ PDF downloaded successfully!', 'success');
+                })
+                .catch(error => {
+                    document.body.removeChild(element);
+                    showMessage('❌ PDF Error: ' + error.message, 'error');
+                    console.error('PDF Error:', error);
+                });
         }
 
         // Generate Report HTML
@@ -580,7 +656,7 @@
             else if (overallPercentage >= 40) overallGrade = 'E';
 
             return `
-                <div style="font-family: Arial; max-width: 800px; margin: 0 auto; border: 2px solid black; padding: 20px;">
+                <div style="font-family: Arial; max-width: 800px; margin: 0 auto; border: 2px solid black; padding: 20px; background: white;">
                     <div style="text-align: center; border-bottom: 2px solid black; padding-bottom: 10px; margin-bottom: 20px;">
                         <div style="font-size: 20px; font-weight: bold;">GGHS BENAZIR DISTRICT SCHOOL NAWABSHAH-1</div>
                         <div style="margin: 5px 0;"><strong>Under the Management of SZABIST Zab-ed</strong></div>
@@ -662,128 +738,15 @@
             `;
         }
 
-        // Search functions
+        // Search function
         function searchStudent() {
             const rollNo = document.getElementById('searchRollNo').value;
             if (!rollNo) {
                 showMessage('Enter roll number', 'error');
                 return;
             }
-
-            setLoading(true);
             
-            const allData = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-            const results = allData.filter(s => s.rollNumber === rollNo);
-            
-            setTimeout(() => {
-                setLoading(false);
-                displaySearchResults(results);
-            }, 500);
-        }
-
-        function viewAllStudents() {
-            setLoading(true);
-            
-            const allData = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-            
-            setTimeout(() => {
-                setLoading(false);
-                displayAllStudents(allData);
-            }, 500);
-        }
-
-        function displaySearchResults(students) {
-            const div = document.getElementById('searchResults');
-            if (!students || students.length === 0) {
-                div.innerHTML = '<div style="color: red; padding: 10px;">No students found</div>';
-                return;
-            }
-            
-            let html = '<table style="width:100%; border-collapse:collapse;"><tr><th>Name</th><th>Father</th><th>Class</th><th>Roll No</th><th>Action</th></tr>';
-            students.forEach(s => {
-                html += `<tr>
-                    <td style="border:1px solid #ddd; padding:8px;">${s.studentName}</td>
-                    <td style="border:1px solid #ddd; padding:8px;">${s.fatherName}</td>
-                    <td style="border:1px solid #ddd; padding:8px;">${s.studentClass}</td>
-                    <td style="border:1px solid #ddd; padding:8px;">${s.rollNumber}</td>
-                    <td style="border:1px solid #ddd; padding:8px;"><button onclick="loadStudent('${s.rollNumber}')">Load</button></td>
-                </tr>`;
-            });
-            html += '</table>';
-            div.innerHTML = html;
-        }
-
-        function displayAllStudents(students) {
-            const div = document.getElementById('searchResults');
-            if (!students || students.length === 0) {
-                div.innerHTML = '<div style="color: red; padding: 10px;">No students found</div>';
-                return;
-            }
-            
-            let html = '<table style="width:100%; border-collapse:collapse;"><tr><th>Name</th><th>Father</th><th>Class</th><th>Roll No</th><th>Action</th></tr>';
-            students.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)).forEach(s => {
-                html += `<tr>
-                    <td style="border:1px solid #ddd; padding:8px;">${s.studentName}</td>
-                    <td style="border:1px solid #ddd; padding:8px;">${s.fatherName}</td>
-                    <td style="border:1px solid #ddd; padding:8px;">${s.studentClass}</td>
-                    <td style="border:1px solid #ddd; padding:8px;">${s.rollNumber}</td>
-                    <td style="border:1px solid #ddd; padding:8px;"><button onclick="loadStudent('${s.rollNumber}')">Load</button></td>
-                </tr>`;
-            });
-            html += '</table>';
-            div.innerHTML = html;
-        }
-
-        function loadStudent(rollNo) {
-            setLoading(true);
-            
-            const allData = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-            const student = allData.filter(s => s.rollNumber === rollNo).sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))[0];
-            
-            setTimeout(() => {
-                setLoading(false);
-                
-                if (!student) {
-                    showMessage('Student not found', 'error');
-                    return;
-                }
-
-                document.getElementById('termName').value = student.term || '1st Term';
-                document.getElementById('studentName').value = student.studentName || '';
-                document.getElementById('fatherName').value = student.fatherName || '';
-                document.getElementById('studentClass').value = student.studentClass || '';
-                document.getElementById('rollNumber').value = student.rollNumber || '';
-                document.getElementById('daysAttended').value = student.daysAttended || '';
-                document.getElementById('totalWorkingDays').value = student.totalWorkingDays || '90';
-                document.getElementById('teacherComments').value = student.teacherComments || '';
-                document.getElementById('classTeacherSign').value = student.classTeacherSign || '';
-                document.getElementById('coordinatorSign').value = student.coordinatorSign || '';
-                document.getElementById('headMistressSign').value = student.headMistressSign || '';
-                document.getElementById('parentSign').value = student.parentSign || '';
-
-                const tbody = document.getElementById('subjectsBody');
-                tbody.innerHTML = '';
-                if (student.subjects && student.subjects.length > 0) {
-                    student.subjects.forEach(subj => {
-                        const row = tbody.insertRow();
-                        row.innerHTML = `
-                            <td><input type="text" value="${subj.name}"></td>
-                            <td><input type="number" value="${subj.totalMarks}"></td>
-                            <td><input type="text" value="${subj.marksObtained}"></td>
-                            <td class="percentage-display">${subj.percentage || '-'}</td>
-                            <td class="grade-display">${subj.grade || '-'}</td>
-                            <td><input type="text" value="${subj.remarks || ''}"></td>
-                            <td><input type="text" value="${subj.signature || ''}"></td>
-                            <td><button onclick="this.closest('tr').remove()" style="background:#dc3545; color:white; border:none; padding:5px 10px; border-radius:3px;">✖</button></td>
-                        `;
-                    });
-                } else {
-                    loadSubjects();
-                }
-                
-                showTab('input');
-                showMessage('Student loaded from local storage!', 'success');
-            }, 500);
+            showMessage('Search feature requires Apps Script backend', 'info');
         }
 
         function clearForm() {
