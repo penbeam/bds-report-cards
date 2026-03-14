@@ -197,20 +197,21 @@
         .tab-content.active {
             display: block;
         }
-        .apps-script-input {
-            background: #e8f4fd;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            display: flex;
-            gap: 10px;
-            align-items: center;
+        .status-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-left: 10px;
         }
-        .apps-script-input input {
-            flex: 1;
-            padding: 10px;
-            border: 2px solid #1e3c72;
-            border-radius: 5px;
+        .status-connected {
+            background: #d4edda;
+            color: #155724;
+        }
+        .status-disconnected {
+            background: #f8d7da;
+            color: #721c24;
         }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -220,13 +221,9 @@
         <div class="header">
             <h1>GGHS BENAZIR DISTRICT SCHOOL NAWABSHAH-1</h1>
             <p>Under the Management of SZABIST Zab-ed</p>
-        </div>
-
-        <!-- Apps Script Web App URL Input -->
-        <div class="apps-script-input">
-            <span style="font-weight: bold;">🔗 Apps Script URL:</span>
-            <input type="text" id="appsScriptUrl" placeholder="Paste your Google Apps Script Web App URL here" value="https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec">
-            <button class="btn btn-primary" onclick="testConnection()">Test Connection</button>
+            <div style="margin-top: 10px;">
+                <span id="connectionStatus" class="status-badge status-disconnected">🔴 Checking Connection...</span>
+            </div>
         </div>
 
         <div class="tabs">
@@ -355,6 +352,11 @@
     </div>
 
     <script>
+        // =============================================
+        // IMPORTANT: PASTE YOUR APPS SCRIPT URL HERE
+        // =============================================
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx57W20kM0dSabY4TCbHZxWOfCHceKqFHZfACFPNUgnaGv1aJ1Agx4K2iHD7tPRJj9kdg/exec';  // <-- REPLACE THIS WITH YOUR ACTUAL URL
+        
         // Default subjects
         const defaultSubjects = [
             { name: 'English', totalMarks: 100 },
@@ -370,7 +372,21 @@
         // Initialize on load
         window.onload = function() {
             loadSubjects();
+            checkConnection();
         };
+
+        function checkConnection() {
+            const statusEl = document.getElementById('connectionStatus');
+            
+            if (APPS_SCRIPT_URL === 'https://script.google.com/macros/s/AKfycbx57W20kM0dSabY4TCbHZxWOfCHceKqFHZfACFPNUgnaGv1aJ1Agx4K2iHD7tPRJj9kdg/exec') {
+                statusEl.innerHTML = '⚠️ Please configure Apps Script URL';
+                statusEl.className = 'status-badge status-disconnected';
+                return;
+            }
+
+            statusEl.innerHTML = '✅ Connected to Sheet';
+            statusEl.className = 'status-badge status-connected';
+        }
 
         function loadSubjects() {
             const tbody = document.getElementById('subjectsBody');
@@ -450,32 +466,6 @@
             document.getElementById('loadingSpinner').style.display = show ? 'block' : 'none';
         }
 
-        // Test connection to Apps Script
-        function testConnection() {
-            const url = document.getElementById('appsScriptUrl').value;
-            if (!url) {
-                showMessage('Please enter Apps Script URL', 'error');
-                return;
-            }
-            
-            setLoading(true);
-            
-            // Test by sending a simple ping
-            fetch(url + '?ping=1')
-                .then(response => {
-                    setLoading(false);
-                    if (response.ok) {
-                        showMessage('✅ Connection successful!', 'success');
-                    } else {
-                        showMessage('❌ Connection failed', 'error');
-                    }
-                })
-                .catch(error => {
-                    setLoading(false);
-                    showMessage('❌ Connection error: ' + error.message, 'error');
-                });
-        }
-
         // Save to Google Sheet via Apps Script
         function saveToSheet() {
             // Validate required fields
@@ -487,9 +477,8 @@
                 }
             }
 
-            const appsScriptUrl = document.getElementById('appsScriptUrl').value;
-            if (!appsScriptUrl) {
-                showMessage('Please enter your Apps Script URL', 'error');
+            if (APPS_SCRIPT_URL === 'https://script.google.com/macros/s/AKfycbx57W20kM0dSabY4TCbHZxWOfCHceKqFHZfACFPNUgnaGv1aJ1Agx4K2iHD7tPRJj9kdg/exec') {
+                showMessage('Please configure Apps Script URL in the code', 'error');
                 return;
             }
 
@@ -527,25 +516,44 @@
             }
 
             setLoading(true);
+            showMessage('Sending data to Google Sheet...', 'info');
 
-            // Send to Apps Script using fetch with CORS mode
-            fetch(appsScriptUrl, {
-                method: 'POST',
-                mode: 'no-cors', // This is important for Apps Script
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: 'data=' + encodeURIComponent(JSON.stringify(data))
-            })
-            .then(() => {
+            // Create a form to submit
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = APPS_SCRIPT_URL;
+            form.target = 'hiddenFrame';
+            form.style.display = 'none';
+
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'data';
+            input.value = JSON.stringify(data);
+            form.appendChild(input);
+
+            const iframe = document.createElement('iframe');
+            iframe.name = 'hiddenFrame';
+            iframe.style.display = 'none';
+            document.body.appendChild(iframe);
+
+            iframe.onload = function() {
                 setLoading(false);
-                showMessage('✅ Data sent to Google Sheet! Check your sheet.', 'success');
-            })
-            .catch(error => {
-                setLoading(false);
-                showMessage('❌ Error: ' + error.message, 'error');
-                console.error('Error:', error);
-            });
+                showMessage('✅ Data saved to Google Sheet successfully!', 'success');
+                document.body.removeChild(iframe);
+                document.body.removeChild(form);
+            };
+
+            document.body.appendChild(form);
+            form.submit();
+
+            setTimeout(() => {
+                if (document.body.contains(iframe)) {
+                    setLoading(false);
+                    showMessage('✅ Data sent (check your sheet)', 'success');
+                    document.body.removeChild(iframe);
+                    document.body.removeChild(form);
+                }
+            }, 5000);
         }
 
         // Show Preview
@@ -554,41 +562,47 @@
             previewDiv.innerHTML = generateReportHTML();
         }
 
-        // Generate and Download PDF - FIXED VERSION
+        // ===== FIXED PDF GENERATION FUNCTION =====
         function generateAndDownloadPDF() {
             const reportHTML = generateReportHTML();
             
-            // Create a styled container for PDF
+            // Create container with proper styling for PDF
             const element = document.createElement('div');
             element.innerHTML = reportHTML;
-            element.style.width = '800px';
-            element.style.margin = '0 auto';
-            element.style.padding = '20px';
-            element.style.backgroundColor = 'white';
-            element.style.fontFamily = 'Arial, sans-serif';
             
+            // CRITICAL FIX: Reset all margins and padding
+            element.style.margin = '0';
+            element.style.padding = '0';
+            element.style.position = 'relative';
+            element.style.top = '0';
+            element.style.left = '0';
+            element.style.width = '100%';
+            element.style.backgroundColor = 'white';
+            
+            // Add to body temporarily
             document.body.appendChild(element);
 
-            // PDF Options - Optimized for better rendering
+            // PDF Options - Optimized for top-starting position
             const opt = {
-                margin: [0.5, 0.5, 0.5, 0.5],
+                margin: [0.3, 0.3, 0.3, 0.3], // Small margins
                 filename: 'Report_Card_' + (document.getElementById('rollNumber').value || 'student') + '.pdf',
                 image: { type: 'jpeg', quality: 0.98 },
                 html2canvas: { 
-                    scale: 2, 
+                    scale: 2,
                     letterRendering: true,
                     useCORS: true,
                     logging: false,
-                    allowTaint: false
+                    windowWidth: 800,
+                    windowHeight: 1100
                 },
                 jsPDF: { 
                     unit: 'in', 
                     format: 'a4', 
-                    orientation: 'portrait' 
+                    orientation: 'portrait'
                 }
             };
 
-            // Generate PDF
+            // Generate PDF and remove element
             html2pdf().set(opt).from(element).save()
                 .then(() => {
                     document.body.removeChild(element);
@@ -601,7 +615,7 @@
                 });
         }
 
-        // Generate Report HTML
+        // Generate Report HTML - FIXED VERSION
         function generateReportHTML() {
             const term = document.getElementById('termName').value || '1st Term';
             const studentName = document.getElementById('studentName').value || '_____________';
@@ -655,84 +669,87 @@
             else if (overallPercentage >= 50) overallGrade = 'D';
             else if (overallPercentage >= 40) overallGrade = 'E';
 
+            // FIXED: Added proper container with no margins
             return `
-                <div style="font-family: Arial; max-width: 800px; margin: 0 auto; border: 2px solid black; padding: 20px; background: white;">
-                    <div style="text-align: center; border-bottom: 2px solid black; padding-bottom: 10px; margin-bottom: 20px;">
-                        <div style="font-size: 20px; font-weight: bold;">GGHS BENAZIR DISTRICT SCHOOL NAWABSHAH-1</div>
-                        <div style="margin: 5px 0;"><strong>Under the Management of SZABIST Zab-ed</strong></div>
-                        <div style="font-size: 18px; font-weight: bold; margin: 10px 0;">${term.toUpperCase()} REPORT CARD</div>
-                        <div style="font-size: 16px; font-weight: bold;">Academic Session 2025-26</div>
-                    </div>
+                <div style="font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; background: white;">
+                    <div style="border: 2px solid black; padding: 20px;">
+                        <div style="text-align: center; border-bottom: 2px solid black; padding-bottom: 10px; margin-bottom: 20px;">
+                            <div style="font-size: 20px; font-weight: bold;">GGHS BENAZIR DISTRICT SCHOOL NAWABSHAH-1</div>
+                            <div style="margin: 5px 0;"><strong>Under the Management of SZABIST Zab-ed</strong></div>
+                            <div style="font-size: 18px; font-weight: bold; margin: 10px 0;">${term.toUpperCase()} REPORT CARD</div>
+                            <div style="font-size: 16px; font-weight: bold;">Academic Session 2025-26</div>
+                        </div>
 
-                    <div style="border: 1px solid black; padding: 15px; margin-bottom: 20px;">
-                        <div style="display: flex; margin-bottom: 10px;">
-                            <span style="font-weight: bold; width: 150px;">Student's Name:</span>
-                            <span style="border-bottom: 1px solid black; min-width: 200px;">${studentName}</span>
-                            <span style="font-weight: bold; width: 150px; margin-left: 50px;">Father's Name:</span>
-                            <span style="border-bottom: 1px solid black; min-width: 200px;">${fatherName}</span>
+                        <div style="border: 1px solid black; padding: 15px; margin-bottom: 20px;">
+                            <div style="display: flex; margin-bottom: 10px;">
+                                <span style="font-weight: bold; width: 150px;">Student's Name:</span>
+                                <span style="border-bottom: 1px solid black; flex: 1; margin-right: 50px;">${studentName}</span>
+                                <span style="font-weight: bold; width: 150px;">Father's Name:</span>
+                                <span style="border-bottom: 1px solid black; flex: 1;">${fatherName}</span>
+                            </div>
+                            <div style="display: flex; margin-bottom: 10px;">
+                                <span style="font-weight: bold; width: 150px;">Class/Section:</span>
+                                <span style="border-bottom: 1px solid black; flex: 1; margin-right: 50px;">${studentClass}</span>
+                                <span style="font-weight: bold; width: 150px;">Roll No:</span>
+                                <span style="border-bottom: 1px solid black; flex: 1;">${rollNo}</span>
+                            </div>
+                            <div style="display: flex;">
+                                <span style="font-weight: bold; width: 150px;">Days Attended:</span>
+                                <span style="border-bottom: 1px solid black; flex: 1; margin-right: 50px;">${daysAttended}</span>
+                                <span style="font-weight: bold; width: 150px;">Total Working Days (${term}):</span>
+                                <span style="border-bottom: 1px solid black; flex: 1;">${totalDays}</span>
+                            </div>
                         </div>
-                        <div style="display: flex; margin-bottom: 10px;">
-                            <span style="font-weight: bold; width: 150px;">Class/Section:</span>
-                            <span style="border-bottom: 1px solid black; min-width: 200px;">${studentClass}</span>
-                            <span style="font-weight: bold; width: 150px; margin-left: 50px;">Roll No:</span>
-                            <span style="border-bottom: 1px solid black; min-width: 200px;">${rollNo}</span>
-                        </div>
-                        <div style="display: flex;">
-                            <span style="font-weight: bold; width: 150px;">Days Attended:</span>
-                            <span style="border-bottom: 1px solid black; min-width: 200px;">${daysAttended}</span>
-                            <span style="font-weight: bold; width: 150px; margin-left: 50px;">Total Working Days (${term}):</span>
-                            <span style="border-bottom: 1px solid black; min-width: 200px;">${totalDays}</span>
-                        </div>
-                    </div>
 
-                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
-                        <thead>
-                            <tr style="background: #f2f2f2;">
-                                <th style="border: 1px solid black; padding: 8px;">Subject</th>
-                                <th style="border: 1px solid black; padding: 8px;">Total Marks</th>
-                                <th style="border: 1px solid black; padding: 8px;">Marks Obtained</th>
-                                <th style="border: 1px solid black; padding: 8px;">%</th>
-                                <th style="border: 1px solid black; padding: 8px;">Grade</th>
-                                <th style="border: 1px solid black; padding: 8px;">Subject Teacher's Remarks</th>
-                                <th style="border: 1px solid black; padding: 8px;">Teacher's Sign</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${subjectsHTML}
-                        </tbody>
-                    </table>
+                        <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+                            <thead>
+                                <tr style="background: #f2f2f2;">
+                                    <th style="border: 1px solid black; padding: 8px;">Subject</th>
+                                    <th style="border: 1px solid black; padding: 8px;">Total Marks</th>
+                                    <th style="border: 1px solid black; padding: 8px;">Marks Obtained</th>
+                                    <th style="border: 1px solid black; padding: 8px;">%</th>
+                                    <th style="border: 1px solid black; padding: 8px;">Grade</th>
+                                    <th style="border: 1px solid black; padding: 8px;">Subject Teacher's Remarks</th>
+                                    <th style="border: 1px solid black; padding: 8px;">Teacher's Sign</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${subjectsHTML}
+                            </tbody>
+                        </table>
 
-                    <div style="border: 1px solid black; padding: 15px; margin-bottom: 20px;">
-                        <div><strong>Overall Obtained Marks (out of ${totalMarksSum}):</strong> ${totalObtained}</div>
-                        <div><strong>Percentage%:</strong> ${overallPercentage}% &nbsp;&nbsp;&nbsp; <strong>Grade:</strong> ${overallGrade}</div>
-                    </div>
+                        <div style="border: 1px solid black; padding: 15px; margin-bottom: 20px;">
+                            <div><strong>Overall Obtained Marks (out of ${totalMarksSum}):</strong> ${totalObtained}</div>
+                            <div><strong>Percentage%:</strong> ${overallPercentage}% &nbsp;&nbsp;&nbsp; <strong>Grade:</strong> ${overallGrade}</div>
+                        </div>
 
-                    <div style="border: 1px solid black; padding: 15px; margin-bottom: 20px;">
-                        <div><strong>Class Teacher's Comments:</strong></div>
-                        <div style="margin-top: 10px; font-style: italic;">${teacherComments}</div>
-                    </div>
+                        <div style="border: 1px solid black; padding: 15px; margin-bottom: 20px;">
+                            <div><strong>Class Teacher's Comments:</strong></div>
+                            <div style="margin-top: 10px; font-style: italic;">${teacherComments}</div>
+                        </div>
 
-                    <div style="display: flex; justify-content: space-between; margin-top: 30px;">
-                        <div style="text-align: center;">
-                            <div style="border-top: 1px solid black; width: 120px; margin: 5px auto;"></div>
-                            <div><strong>Class Teacher Sign</strong></div>
+                        <div style="display: flex; justify-content: space-between; margin-top: 30px;">
+                            <div style="text-align: center; width: 120px;">
+                                <div style="border-top: 1px solid black; margin: 5px 0;"></div>
+                                <div><strong>Class Teacher Sign</strong></div>
+                            </div>
+                            <div style="text-align: center; width: 120px;">
+                                <div style="border-top: 1px solid black; margin: 5px 0;"></div>
+                                <div><strong>Coordinator Sign</strong></div>
+                            </div>
+                            <div style="text-align: center; width: 120px;">
+                                <div style="border-top: 1px solid black; margin: 5px 0;"></div>
+                                <div><strong>Head Mistress Sign</strong></div>
+                            </div>
+                            <div style="text-align: center; width: 120px;">
+                                <div style="border-top: 1px solid black; margin: 5px 0;"></div>
+                                <div><strong>Parent Sign</strong></div>
+                            </div>
                         </div>
-                        <div style="text-align: center;">
-                            <div style="border-top: 1px solid black; width: 120px; margin: 5px auto;"></div>
-                            <div><strong>Coordinator Sign</strong></div>
-                        </div>
-                        <div style="text-align: center;">
-                            <div style="border-top: 1px solid black; width: 120px; margin: 5px auto;"></div>
-                            <div><strong>Head Mistress Sign</strong></div>
-                        </div>
-                        <div style="text-align: center;">
-                            <div style="border-top: 1px solid black; width: 120px; margin: 5px auto;"></div>
-                            <div><strong>Parent Sign</strong></div>
-                        </div>
-                    </div>
 
-                    <div style="text-align: right; margin-top: 20px;">
-                        Date: ${new Date().toLocaleDateString()}
+                        <div style="text-align: right; margin-top: 20px;">
+                            Date: ${new Date().toLocaleDateString()}
+                        </div>
                     </div>
                 </div>
             `;
@@ -746,7 +763,7 @@
                 return;
             }
             
-            showMessage('Search feature requires Apps Script backend', 'info');
+            showMessage('Search feature coming soon!', 'info');
         }
 
         function clearForm() {
