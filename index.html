@@ -378,7 +378,7 @@
         function checkConnection() {
             const statusEl = document.getElementById('connectionStatus');
             
-            if (APPS_SCRIPT_URL === 'https://script.google.com/macros/s/AKfycbx57W20kM0dSabY4TCbHZxWOfCHceKqFHZfACFPNUgnaGv1aJ1Agx4K2iHD7tPRJj9kdg/exec') {
+            if (APPS_SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE') {
                 statusEl.innerHTML = '⚠️ Please configure Apps Script URL';
                 statusEl.className = 'status-badge status-disconnected';
                 return;
@@ -477,7 +477,7 @@
                 }
             }
 
-            if (APPS_SCRIPT_URL === 'https://script.google.com/macros/s/AKfycbx57W20kM0dSabY4TCbHZxWOfCHceKqFHZfACFPNUgnaGv1aJ1Agx4K2iHD7tPRJj9kdg/exec') {
+            if (APPS_SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE') {
                 showMessage('Please configure Apps Script URL in the code', 'error');
                 return;
             }
