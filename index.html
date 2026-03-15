@@ -1338,63 +1338,88 @@
         }
 
         // =============================================
-        // FETCH ALL STUDENTS (UPDATED to handle new fields)
-        // =============================================
-        function fetchAllStudents() {
-            const url = document.getElementById('appsScriptUrl').value;
-            
-            if (!url || url === 'YOUR_APPS_SCRIPT_URL_HERE') {
-                showMessage('Please enter your Google Apps Script URL first', 'error');
-                return;
+// FETCH ALL STUDENTS (IMPROVED - Better error handling)
+// =============================================
+function fetchAllStudents() {
+    const url = document.getElementById('appsScriptUrl').value;
+    
+    if (!url || url === 'YOUR_APPS_SCRIPT_URL_HERE') {
+        showMessage('Please enter your Google Apps Script URL first', 'error');
+        return;
+    }
+
+    setLoading(true);
+    showMessage('Fetching all student records...', 'info');
+
+    // Create a unique callback name
+    const callbackName = 'jsonp_callback_' + Date.now();
+    
+    // Create a promise to handle the JSONP request
+    const fetchPromise = new Promise((resolve, reject) => {
+        // Set a timeout
+        const timeout = setTimeout(() => {
+            cleanup();
+            reject(new Error('Request timeout'));
+        }, 15000);
+
+        // Define the callback function
+        window[callbackName] = function(data) {
+            clearTimeout(timeout);
+            cleanup();
+            if (data && data.error) {
+                reject(new Error(data.error));
+            } else {
+                resolve(data);
             }
+        };
 
-            setLoading(true);
-            showMessage('Fetching all student records...', 'info');
-
-            const callbackName = 'jsonp_callback_' + Date.now();
-            const script = document.createElement('script');
-            script.src = url + '?callback=' + callbackName;
-            
-            window[callbackName] = function(data) {
-                try {
-                    if (data && data.students && data.students.length > 0) {
-                        localStorage.setItem(STORAGE_KEY, JSON.stringify(data.students));
-                        populateClassFilters(data.students);
-                        displayStudentRecords(data.students);
-                        showMessage(`✅ Loaded ${data.students.length} student records`, 'success');
-                    } else {
-                        document.getElementById('searchResults').innerHTML = '<div class="message info">No student records found</div>';
-                    }
-                } catch (e) {
-                    showMessage('Error processing data', 'error');
-                } finally {
-                    delete window[callbackName];
-                    document.body.removeChild(script);
-                    setLoading(false);
-                }
-            };
-
-            script.onerror = function() {
-                setLoading(false);
-                showMessage('❌ Failed to fetch from Google Sheet', 'error');
-                delete window[callbackName];
-                document.body.removeChild(script);
-            };
-
-            document.body.appendChild(script);
-            
-            setTimeout(() => {
-                if (window[callbackName]) {
-                    setLoading(false);
-                    showMessage('❌ Request timeout', 'error');
-                    delete window[callbackName];
-                    if (document.body.contains(script)) {
-                        document.body.removeChild(script);
-                    }
-                }
-            }, 10000);
+        // Cleanup function
+        function cleanup() {
+            delete window[callbackName];
+            if (script && script.parentNode) {
+                script.parentNode.removeChild(script);
+            }
         }
 
+        // Create script element
+        const script = document.createElement('script');
+        script.src = url + '?callback=' + callbackName;
+        
+        script.onerror = function() {
+            clearTimeout(timeout);
+            cleanup();
+            reject(new Error('Failed to load script'));
+        };
+
+        document.body.appendChild(script);
+    });
+
+    // Handle the promise
+    fetchPromise
+        .then(data => {
+            if (data && data.students && data.students.length > 0) {
+                // Store in localStorage
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(data.students));
+                
+                // Populate filters
+                populateClassFilters(data.students);
+                
+                // Display records
+                displayStudentRecords(data.students);
+                
+                showMessage(`✅ Loaded ${data.students.length} student records`, 'success');
+            } else {
+                document.getElementById('searchResults').innerHTML = '<div class="message info">No student records found</div>';
+                showMessage('No records found', 'info');
+            }
+            setLoading(false);
+        })
+        .catch(error => {
+            setLoading(false);
+            showMessage('❌ Failed to fetch: ' + error.message, 'error');
+            console.error('Fetch error:', error);
+        });
+}
         // =============================================
         // Populate Class Filters
         // =============================================
