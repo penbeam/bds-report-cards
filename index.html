@@ -232,7 +232,7 @@
 
         .card h2 {
             color: var(--primary);
-            margin-bottom: 16px;
+            margin-bottom: 20px;
             padding-bottom: 12px;
             border-bottom: 2px solid var(--gray-light);
             font-size: clamp(16px, 5vw, 18px);
@@ -245,11 +245,25 @@
         /* =============================================
            FORM - Mobile First Grid
         ============================================= */
-        .term-row {
+        .academic-row {
             margin-bottom: 20px;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
         }
 
-        .term-label {
+        @media (min-width: 768px) {
+            .academic-row {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        .academic-field {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .academic-field label {
             font-weight: 600;
             color: var(--primary);
             font-size: 14px;
@@ -257,26 +271,24 @@
             display: block;
         }
 
-        .term-input {
+        .academic-field input {
             width: 100%;
             padding: 14px 16px;
             border: 2px solid var(--gray-light);
             border-radius: var(--radius-sm);
             font-size: 15px;
             transition: var(--transition);
-            margin-bottom: 8px;
         }
 
-        .term-input:focus {
+        .academic-field input:focus {
             outline: none;
             border-color: var(--primary);
             box-shadow: 0 0 0 3px rgba(30,60,114,0.1);
         }
 
-        .term-hint {
-            font-size: 13px;
+        .academic-field .hint {
+            font-size: 12px;
             color: var(--gray);
-            display: block;
             margin-top: 4px;
         }
 
@@ -872,6 +884,10 @@
             .filter-row {
                 gap: 10px;
             }
+            
+            .academic-row {
+                grid-template-columns: 1fr;
+            }
         }
 
         /* Touch device optimizations */
@@ -929,11 +945,26 @@
             <!-- Student Information -->
             <div class="card">
                 <h2>📝 Student Information</h2>
-                <div class="term-row">
-                    <label class="term-label">Term</label>
-                    <input type="text" id="termName" class="term-input" value="1st Term">
-                    <span class="term-hint">Editable - Change to 2nd Term, Final Term, etc.</span>
+                
+                <!-- New Academic Session, Report Term, Working Days Term fields -->
+                <div class="academic-row">
+                    <div class="academic-field">
+                        <label>Academic Session</label>
+                        <input type="text" id="academicSession" value="2025-26" placeholder="e.g., 2025-26">
+                        <span class="hint">e.g., 2025-26</span>
+                    </div>
+                    <div class="academic-field">
+                        <label>Report Term</label>
+                        <input type="text" id="reportTerm" value="1st Term" placeholder="e.g., 1st Term">
+                        <span class="hint">Appears in report title</span>
+                    </div>
+                    <div class="academic-field">
+                        <label>Working Days Term</label>
+                        <input type="text" id="workingDaysTerm" value="1st Term" placeholder="e.g., 1st Term">
+                        <span class="hint">Appears in Total Working Days label</span>
+                    </div>
                 </div>
+
                 <div class="form-grid">
                     <div class="form-group">
                         <label>Student Name <span class="required">*</span></label>
@@ -1032,7 +1063,7 @@
                     </div>
                 </div>
                 
-                <!-- NEW: Class Filter Row -->
+                <!-- Class Filter Row -->
                 <div class="filter-row">
                     <div class="filter-group">
                         <label for="gradeFilter">Grade</label>
@@ -1217,7 +1248,7 @@
         }
 
         // =============================================
-        // SAVE FUNCTIONS
+        // SAVE FUNCTIONS (UPDATED with new fields)
         // =============================================
         function saveToLocalStorage(data) {
             try {
@@ -1247,8 +1278,13 @@
                 }
             }
 
+            // Updated data object with new fields
             const data = {
-                term: document.getElementById('termName').value,
+                academicSession: document.getElementById('academicSession').value,
+                reportTerm: document.getElementById('reportTerm').value,
+                workingDaysTerm: document.getElementById('workingDaysTerm').value,
+                // Keep old term field for backward compatibility
+                term: document.getElementById('reportTerm').value,
                 studentName: document.getElementById('studentName').value,
                 fatherName: document.getElementById('fatherName').value,
                 studentClass: document.getElementById('studentClass').value,
@@ -1302,7 +1338,7 @@
         }
 
         // =============================================
-        // FETCH ALL STUDENTS (UPDATED to populate filters)
+        // FETCH ALL STUDENTS (UPDATED to handle new fields)
         // =============================================
         function fetchAllStudents() {
             const url = document.getElementById('appsScriptUrl').value;
@@ -1360,21 +1396,16 @@
         }
 
         // =============================================
-        // NEW: Populate Class Filters
+        // Populate Class Filters
         // =============================================
         function populateClassFilters(students) {
             const gradeSet = new Set();
-            const sectionMap = new Map(); // grade -> Set of sections
             
             students.forEach(student => {
                 const classStr = student.studentClass || '';
                 if (classStr.includes('-')) {
-                    const [grade, section] = classStr.split('-');
+                    const [grade] = classStr.split('-');
                     gradeSet.add(grade.trim());
-                    if (!sectionMap.has(grade)) {
-                        sectionMap.set(grade, new Set());
-                    }
-                    sectionMap.get(grade).add(section.trim());
                 } else if (classStr) {
                     gradeSet.add(classStr.trim());
                 }
@@ -1402,7 +1433,7 @@
         }
 
         // =============================================
-        // NEW: Update Section Options based on selected Grade
+        // Update Section Options based on selected Grade
         // =============================================
         function updateSectionOptions() {
             const gradeSelect = document.getElementById('gradeFilter');
@@ -1440,7 +1471,7 @@
         }
 
         // =============================================
-        // NEW: Apply Filters (replaces old searchStudent)
+        // Apply Filters
         // =============================================
         function applyFilters() {
             const grade = document.getElementById('gradeFilter').value;
@@ -1516,7 +1547,7 @@
         }
 
         // =============================================
-        // NEW: Clear specific filter
+        // Clear specific filter
         // =============================================
         function clearFilter(filterType) {
             if (filterType === 'grade') {
@@ -1531,14 +1562,14 @@
         }
 
         // =============================================
-        // UPDATE: Keep old searchStudent for backward compatibility
+        // Keep old searchStudent for backward compatibility
         // =============================================
         function searchStudent() {
             applyFilters();
         }
 
         // =============================================
-        // DISPLAY STUDENT RECORDS (unchanged)
+        // DISPLAY STUDENT RECORDS (UPDATED with new fields)
         // =============================================
         function displayStudentRecords(students) {
             const container = document.getElementById('searchResults');
@@ -1557,7 +1588,8 @@
                                 <th>Name</th>
                                 <th>Father</th>
                                 <th>Class</th>
-                                <th>Term</th>
+                                <th>Report Term</th>
+                                <th>Academic Session</th>
                                 <th>Date</th>
                                 <th>Action</th>
                             </tr>
@@ -1574,7 +1606,8 @@
                         <td>${student.studentName || 'N/A'}</td>
                         <td>${student.fatherName || 'N/A'}</td>
                         <td>${student.studentClass || 'N/A'}</td>
-                        <td>${student.term || 'N/A'}</td>
+                        <td>${student.reportTerm || student.term || 'N/A'}</td>
+                        <td>${student.academicSession || '2025-26'}</td>
                         <td>${date}</td>
                         <td>
                             <button class="load-btn" onclick='loadStudentData(${JSON.stringify(student).replace(/'/g, "\\'")})'>Load</button>
@@ -1588,7 +1621,7 @@
         }
 
         // =============================================
-        // CLEAR SEARCH RESULTS (updated)
+        // CLEAR SEARCH RESULTS
         // =============================================
         function clearSearchResults() {
             document.getElementById('searchResults').innerHTML = '<div class="message info">Select filters and click Search or Fetch All to load records</div>';
@@ -1600,10 +1633,15 @@
         }
 
         // =============================================
-        // LOAD STUDENT DATA (unchanged)
+        // LOAD STUDENT DATA (UPDATED with new fields)
         // =============================================
         function loadStudentData(student) {
-            document.getElementById('termName').value = student.term || '1st Term';
+            // Load new fields
+            document.getElementById('academicSession').value = student.academicSession || '2025-26';
+            document.getElementById('reportTerm').value = student.reportTerm || student.term || '1st Term';
+            document.getElementById('workingDaysTerm').value = student.workingDaysTerm || student.term || '1st Term';
+            
+            // Load existing fields
             document.getElementById('studentName').value = student.studentName || '';
             document.getElementById('fatherName').value = student.fatherName || '';
             document.getElementById('studentClass').value = student.studentClass || '';
@@ -1642,7 +1680,7 @@
         }
 
         // =============================================
-        // PRINT REPORT CARD (unchanged)
+        // PRINT REPORT CARD (UPDATED with new fields)
         // =============================================
         function printReportCard() {
             showMessage('Preparing PDF...', 'info');
@@ -1668,10 +1706,14 @@
         }
 
         // =============================================
-        // GENERATE PRINTABLE HTML (unchanged)
+        // GENERATE PRINTABLE HTML (UPDATED with new fields)
         // =============================================
         function generatePrintableHTML() {
-            const term = document.getElementById('termName').value || '1st Term';
+            // Use new fields with fallbacks
+            const academicSession = document.getElementById('academicSession').value || '2025-26';
+            const reportTerm = document.getElementById('reportTerm').value || '1st Term';
+            const workingDaysTerm = document.getElementById('workingDaysTerm').value || '1st Term';
+            
             const studentName = document.getElementById('studentName').value || 'Aleshka';
             const fatherName = document.getElementById('fatherName').value || 'Mustafa';
             const studentClass = document.getElementById('studentClass').value || 'VII';
@@ -1921,8 +1963,8 @@ font-weight: 600;
             <div class="title-section">
                 <div class="school-name">GGHS BENAZIR DISTRICT SCHOOL NAWABSHAH-1</div>
                 <div class="management">Under the Management of SZABIST Zab-ed</div>
-                <div class="report-title">${term.toUpperCase()} REPORT CARD</div>
-                <div class="academic-session">Academic Session 2025-26</div>
+                <div class="report-title">${reportTerm.toUpperCase()} REPORT CARD</div>
+                <div class="academic-session">Academic Session ${academicSession}</div>
             </div>
             <div class="logo-right">${rightLogoUrl !== 'YOUR_RIGHT_LOGO_URL_HERE' ? `<img src="${rightLogoUrl}">` : ''}</div>
         </div>
@@ -1930,7 +1972,7 @@ font-weight: 600;
         <div class="student-info">
             <div class="info-row"><span class="info-label">Student's Name:</span><span class="info-value">${studentName}</span><span class="info-label">Father's Name:</span><span class="info-value">${fatherName}</span></div>
             <div class="info-row"><span class="info-label">Class/Section:</span><span class="info-value">${studentClass}</span><span class="info-label">Roll No:</span><span class="info-value">${rollNo}</span></div>
-            <div class="info-row"><span class="info-label">Days Attended:</span><span class="info-value">${daysAttended}</span><span class="info-label">T. Work Days (${term}):</span><span class="info-value">${totalDays}</span></div>
+            <div class="info-row"><span class="info-label">Days Attended:</span><span class="info-value">${daysAttended}</span><span class="info-label">T. Work Days (${workingDaysTerm}):</span><span class="info-value">${totalDays}</span></div>
         </div>
 
         <table>
@@ -1956,7 +1998,7 @@ font-weight: 600;
         }
 
         // =============================================
-        // SHOW PREVIEW (unchanged)
+        // SHOW PREVIEW
         // =============================================
         function showPreview() {
             const previewDiv = document.getElementById('reportPreview');
@@ -1964,7 +2006,7 @@ font-weight: 600;
         }
 
         // =============================================
-        // UTILITY FUNCTIONS (unchanged)
+        // UTILITY FUNCTIONS
         // =============================================
         function showTab(tabName) {
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -1991,7 +2033,12 @@ font-weight: 600;
         }
 
         function clearForm() {
-            document.getElementById('termName').value = '1st Term';
+            // Clear new fields
+            document.getElementById('academicSession').value = '2025-26';
+            document.getElementById('reportTerm').value = '1st Term';
+            document.getElementById('workingDaysTerm').value = '1st Term';
+            
+            // Clear existing fields
             document.getElementById('studentName').value = 'Aleshka';
             document.getElementById('fatherName').value = 'Mustafa';
             document.getElementById('studentClass').value = 'VII';
