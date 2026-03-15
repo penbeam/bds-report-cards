@@ -284,6 +284,10 @@
             background: linear-gradient(135deg, #17a2b8, #138496);
         }
         
+        .btn-secondary {
+            background: linear-gradient(135deg, #6c757d, #495057);
+        }
+        
         /* Messages */
         .message {
             padding: 15px 20px;
@@ -441,10 +445,46 @@
             border-radius: 5px;
             cursor: pointer;
             font-size: 12px;
+            margin-right: 5px;
         }
         
         .load-btn:hover {
             background: #2a5298;
+        }
+        
+        .delete-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 5px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        .delete-btn:hover {
+            background: #c82333;
+        }
+        
+        .search-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .clear-btn {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .clear-btn:hover {
+            background: #5a6268;
         }
         
         /* Responsive */
@@ -473,7 +513,7 @@
             <input type="text" id="appsScriptUrl" placeholder="https://script.google.com/macros/s/.../exec" value="https://script.google.com/macros/s/AKfycbyl_KanGZ1sl63hDfHw8kxeFvLvXceVtuqcWAcIms0NkWg6ogrg4uAx5IL1WkGxsnHFrA/exec">
             <span id="connectionStatus" class="status-badge status-disconnected">🔴 Not Configured</span>
         </div>
- 
+
         <!-- Tabs -->
         <div class="tabs">
             <button class="tab active" onclick="showTab('input')">➕ Add Student</button>
@@ -588,13 +628,18 @@
         <!-- SEARCH TAB -->
         <div id="tab-search" class="tab-content">
             <div class="card">
-                <h2>🔍 Search Student</h2>
+                <div class="search-header">
+                    <h2>🔍 Search Student Records</h2>
+                    <button class="clear-btn" onclick="clearSearchResults()">🗑️ Clear Results</button>
+                </div>
                 <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px;">
                     <input type="text" id="searchRollNo" placeholder="Enter Roll Number to search" style="flex: 1; min-width: 250px; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px;">
                     <button class="btn btn-primary" onclick="searchStudent()">🔍 Search</button>
-                    <button class="btn btn-info" onclick="viewAllStudents()">📋 View All</button>
+                    <button class="btn btn-info" onclick="fetchAllStudents()">📋 Fetch All from Sheet</button>
                 </div>
-                <div id="searchResults" class="search-results"></div>
+                <div id="searchResults" class="search-results">
+                    <div class="message info">Click "Fetch All from Sheet" to load all student records</div>
+                </div>
             </div>
         </div>
 
@@ -626,7 +671,7 @@
         ];
 
         // =============================================
-        // LOCAL STORAGE KEY FOR SEARCH
+        // LOCAL STORAGE KEY (for cache)
         // =============================================
         const STORAGE_KEY = 'gghs_report_cards';
 
@@ -638,16 +683,13 @@
             checkConnection();
             showPreview();
             initializeStorage();
-            console.log('Search system initialized');
+            console.log('System initialized');
         };
 
         function initializeStorage() {
             if (!localStorage.getItem(STORAGE_KEY)) {
                 localStorage.setItem(STORAGE_KEY, JSON.stringify([]));
                 console.log('Local storage initialized');
-            } else {
-                const count = JSON.parse(localStorage.getItem(STORAGE_KEY)).length;
-                console.log('Local storage has', count, 'records');
             }
         }
 
@@ -666,7 +708,6 @@
             // Calculate percentage and grade if obtained is provided
             let percentage = '-';
             let grade = '-';
-            let gradeClass = '';
             
             if (obtained && obtained.toUpperCase() === 'A') {
                 percentage = 'A';
@@ -749,7 +790,23 @@
         }
 
         // =============================================
-        // SAVE TO GOOGLE SHEET (UPDATED WITH LOCAL STORAGE)
+        // SAVE TO LOCAL STORAGE (cache)
+        // =============================================
+        function saveToLocalStorage(data) {
+            try {
+                const savedData = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+                savedData.push(data);
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(savedData));
+                console.log('✅ Cached to localStorage:', data.rollNumber);
+                return true;
+            } catch (e) {
+                console.error('❌ Error caching to localStorage:', e);
+                return false;
+            }
+        }
+
+        // =============================================
+        // SAVE TO GOOGLE SHEET
         // =============================================
         function saveToSheet() {
             const url = document.getElementById('appsScriptUrl').value;
@@ -802,12 +859,12 @@
             }
 
             setLoading(true);
-            showMessage('Saving to local storage and sending to Google Sheet...', 'info');
+            showMessage('Saving to Google Sheet...', 'info');
 
-            // Save to localStorage FIRST (for search functionality)
+            // Save to localStorage as cache
             saveToLocalStorage(data);
 
-            // Then send to Google Sheets
+            // Send to Google Sheets
             fetch(url, {
                 method: 'POST',
                 mode: 'no-cors',
@@ -818,16 +875,224 @@
             })
             .then(() => {
                 setLoading(false);
-                showMessage('✅ Data saved to Google Sheet and local storage!', 'success');
+                showMessage('✅ Data saved to Google Sheet successfully!', 'success');
             })
             .catch(error => {
                 setLoading(false);
-                showMessage('✅ Data saved to local storage only. Sheet error: ' + error.message, 'info');
+                showMessage('❌ Error saving to sheet: ' + error.message, 'error');
             });
         }
 
         // =============================================
-        // PRINT REPORT CARD (WORKS 100% - USES PRINT DIALOG)
+        // FETCH ALL STUDENTS FROM GOOGLE SHEET
+        // =============================================
+        function fetchAllStudents() {
+            const url = document.getElementById('appsScriptUrl').value;
+            
+            if (!url || url === 'YOUR_APPS_SCRIPT_URL_HERE') {
+                showMessage('Please enter your Google Apps Script URL first', 'error');
+                return;
+            }
+
+            setLoading(true);
+            showMessage('Fetching all student records from Google Sheet...', 'info');
+
+            // Create a unique callback name to avoid caching
+            const callbackName = 'jsonp_callback_' + Date.now();
+            
+            // Create a script element for JSONP request
+            const script = document.createElement('script');
+            script.src = url + '?action=getAll&callback=' + callbackName;
+            
+            // Define the callback function
+            window[callbackName] = function(data) {
+                try {
+                    console.log('Received data from sheet:', data);
+                    
+                    if (data && data.students && data.students.length > 0) {
+                        // Cache the data in localStorage
+                        localStorage.setItem(STORAGE_KEY, JSON.stringify(data.students));
+                        
+                        // Display the results
+                        displayStudentRecords(data.students);
+                        showMessage(`✅ Loaded ${data.students.length} student records from sheet`, 'success');
+                    } else {
+                        document.getElementById('searchResults').innerHTML = '<div class="message info">No student records found in sheet</div>';
+                    }
+                } catch (e) {
+                    console.error('Error processing sheet data:', e);
+                    showMessage('Error processing sheet data', 'error');
+                } finally {
+                    // Clean up
+                    delete window[callbackName];
+                    document.body.removeChild(script);
+                    setLoading(false);
+                }
+            };
+
+            // Handle errors
+            script.onerror = function() {
+                setLoading(false);
+                showMessage('❌ Failed to fetch from Google Sheet. Check your URL.', 'error');
+                delete window[callbackName];
+                document.body.removeChild(script);
+            };
+
+            document.body.appendChild(script);
+            
+            // Timeout fallback
+            setTimeout(() => {
+                if (window[callbackName]) {
+                    setLoading(false);
+                    showMessage('❌ Request timeout. Check your sheet URL.', 'error');
+                    delete window[callbackName];
+                    if (document.body.contains(script)) {
+                        document.body.removeChild(script);
+                    }
+                }
+            }, 10000);
+        }
+
+        // =============================================
+        // SEARCH STUDENT (searches in cached data)
+        // =============================================
+        function searchStudent() {
+            const rollNo = document.getElementById('searchRollNo').value.trim();
+            if (!rollNo) {
+                showMessage('Please enter a roll number', 'error');
+                return;
+            }
+
+            try {
+                // Try to get from cache first
+                const cachedData = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+                
+                if (cachedData.length > 0) {
+                    // Search in cached data
+                    const results = cachedData.filter(s => s.rollNumber == rollNo);
+                    
+                    if (results.length > 0) {
+                        const sorted = results.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+                        displayStudentRecords(sorted);
+                        showMessage(`Found ${results.length} record(s) in cache`, 'success');
+                        return;
+                    }
+                }
+                
+                // If not found in cache, fetch from sheet
+                fetchAndSearchStudent(rollNo);
+                
+            } catch (e) {
+                console.error('Search error:', e);
+                showMessage('Search error: ' + e.message, 'error');
+            }
+        }
+
+        // Fetch from sheet and search
+        function fetchAndSearchStudent(rollNo) {
+            const url = document.getElementById('appsScriptUrl').value;
+            
+            const callbackName = 'search_callback_' + Date.now();
+            const script = document.createElement('script');
+            script.src = url + '?action=getAll&callback=' + callbackName;
+            
+            window[callbackName] = function(data) {
+                try {
+                    if (data && data.students) {
+                        // Cache all data
+                        localStorage.setItem(STORAGE_KEY, JSON.stringify(data.students));
+                        
+                        // Search in the freshly fetched data
+                        const results = data.students.filter(s => s.rollNumber == rollNo);
+                        
+                        if (results.length > 0) {
+                            const sorted = results.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+                            displayStudentRecords(sorted);
+                            showMessage(`Found ${results.length} record(s) in sheet`, 'success');
+                        } else {
+                            document.getElementById('searchResults').innerHTML = `<div class="message error">No records found for roll number: ${rollNo}</div>`;
+                        }
+                    }
+                } catch (e) {
+                    console.error('Error:', e);
+                    showMessage('Error searching sheet', 'error');
+                } finally {
+                    delete window[callbackName];
+                    document.body.removeChild(script);
+                    setLoading(false);
+                }
+            };
+
+            script.onerror = function() {
+                setLoading(false);
+                showMessage('❌ Failed to fetch from Google Sheet', 'error');
+                delete window[callbackName];
+                document.body.removeChild(script);
+            };
+
+            document.body.appendChild(script);
+        }
+
+        // =============================================
+        // DISPLAY STUDENT RECORDS
+        // =============================================
+        function displayStudentRecords(students) {
+            const container = document.getElementById('searchResults');
+            
+            if (!students || students.length === 0) {
+                container.innerHTML = '<div class="message info">No records to display</div>';
+                return;
+            }
+            
+            let html = `
+                <table class="results-table">
+                    <thead>
+                        <tr>
+                            <th>Roll No</th>
+                            <th>Student Name</th>
+                            <th>Father's Name</th>
+                            <th>Class</th>
+                            <th>Term</th>
+                            <th>Date</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            students.forEach((student) => {
+                const date = student.timestamp ? new Date(student.timestamp).toLocaleString() : 'N/A';
+                
+                html += `
+                    <tr>
+                        <td>${student.rollNumber || 'N/A'}</td>
+                        <td>${student.studentName || 'N/A'}</td>
+                        <td>${student.fatherName || 'N/A'}</td>
+                        <td>${student.studentClass || 'N/A'}</td>
+                        <td>${student.term || 'N/A'}</td>
+                        <td>${date}</td>
+                        <td>
+                            <button class="load-btn" onclick='loadStudentData(${JSON.stringify(student).replace(/'/g, "\\'")})'>Load</button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
+        // =============================================
+        // CLEAR SEARCH RESULTS
+        // =============================================
+        function clearSearchResults() {
+            document.getElementById('searchResults').innerHTML = '<div class="message info">Click "Fetch All from Sheet" to load student records</div>';
+            document.getElementById('searchRollNo').value = '';
+            showMessage('Search results cleared', 'success');
+        }
+
+        // =============================================
+        // PRINT REPORT CARD
         // =============================================
         function printReportCard() {
             showMessage('Preparing report card for printing...', 'info');
@@ -858,7 +1123,7 @@
         }
 
         // =============================================
-        // GENERATE PRINTABLE HTML WITH TWO LOGOS (ONLY IN PDF/PRINT)
+        // GENERATE PRINTABLE HTML
         // =============================================
         function generatePrintableHTML() {
             const term = document.getElementById('termName').value || '1st Term';
@@ -871,8 +1136,7 @@
             const teacherComments = document.getElementById('teacherComments').value || 'Needs focus attention and consistent practice';
             
             // =============================================
-            // IMPORTANT: REPLACE THESE WITH YOUR LOGO URLs
-            // AFTER UPLOADING TO GITHUB
+            // LOGO URLs
             // =============================================
             const leftLogoUrl = 'https://raw.githubusercontent.com/penbeam/bds-report-cards/226b18442780cec5aff3c4de43dc445df08f3fe6/images/SZABIST_LOGO.png';
             const rightLogoUrl = 'https://raw.githubusercontent.com/penbeam/bds-report-cards/226b18442780cec5aff3c4de43dc445df08f3fe6/images/BDS-Logo.png';
@@ -926,246 +1190,55 @@
                 <head>
                     <title>GGHS Benazir - Report Card</title>
                     <style>
-                        /* RESET ALL MARGINS AND PADDING */
-                        * {
-                            margin: 0;
-                            padding: 0;
-                            box-sizing: border-box;
-                        }
-                        
-                        body {
-                            font-family: Arial, sans-serif;
-                            background: white;
-                            margin: 0;
-                            padding: 0;
-                            width: 100%;
-                        }
-                        
-                        .report-card {
-                            max-width: 1100px;
-                            margin: 0 auto;
-                            border: 3px solid #1e3c72;
-                            padding: 30px;
-                            background: white;
-                            position: relative;
-                        }
-                        
-                        /* Header with two logos */
-                        .logo-header {
-                            display: flex;
-                            align-items: center;
-                            justify-content: space-between;
-                            margin-bottom: 20px;
-                            padding-bottom: 15px;
-                            border-bottom: 2px solid #1e3c72;
-                        }
-                        
-                        .logo-left, .logo-right {
-                            width: 100px;
-                            height: 100px;
-                            display: flex;
-                            align-items: center;
-                            justify-content: center;
-                        }
-                        
-                        .logo-left img, .logo-right img {
-                            max-width: 100px;
-                            max-height: 100px;
-                            object-fit: contain;
-                        }
-                        
-                        .title-section {
-                            text-align: center;
-                            flex: 1;
-                        }
-                        
-                        .school-name {
-                            font-size: 24px;
-                            font-weight: bold;
-                            color: #1e3c72;
-                            margin-bottom: 5px;
-                        }
-                        
-                        .management {
-                            font-size: 16px;
-                            font-weight: bold;
-                            margin: 5px 0;
-                        }
-                        
-                        .report-title {
-                            font-size: 22px;
-                            font-weight: bold;
-                            margin: 10px 0;
-                            text-decoration: underline;
-                        }
-                        
-                        .academic-session {
-                            font-size: 18px;
-                            font-weight: bold;
-                        }
-                        
-                        .student-info {
-                            border: 1px solid black;
-                            padding: 15px;
-                            margin-bottom: 25px;
-                        }
-                        
-                        .info-row {
-                            display: flex;
-                            margin-bottom: 10px;
-                        }
-                        
-                        .info-label {
-                            font-weight: bold;
-                            width: 160px;
-                        }
-                        
-                        .info-value {
-                            border-bottom: 1px solid black;
-                            flex: 1;
-                            margin-right: 30px;
-                            min-height: 25px;
-                        }
-                        
-                        table {
-                            width: 100%;
-                            border-collapse: collapse;
-                            margin-bottom: 25px;
-                        }
-                        
-                        th {
-                            background: #1e3c72;
-                            color: white;
-                            padding: 12px;
-                            border: 1px solid black;
-                            font-size: 14px;
-                        }
-                        
-                        td {
-                            border: 1px solid black;
-                            padding: 8px;
-                        }
-                        
-                        .summary-box {
-                            border: 1px solid black;
-                            padding: 15px;
-                            margin-bottom: 25px;
-                            background: #f9f9f9;
-                        }
-                        
-                        .comments-box {
-                            border: 1px solid black;
-                            padding: 15px;
-                            margin-bottom: 30px;
-                        }
-                        
-                        .signatures {
-                            display: flex;
-                            justify-content: space-between;
-                            margin-top: 50px;
-                        }
-                        
-                        .signature-item {
-                            text-align: center;
-                            width: 140px;
-                        }
-                        
-                        .signature-line {
-                            border-top: 2px solid black;
-                            margin-bottom: 5px;
-                            width: 100%;
-                        }
-                        
-                        .date {
-                            text-align: right;
-                            margin-top: 30px;
-                            font-size: 14px;
-                        }
-                        
-                        /* CRITICAL FIX: Remove browser headers/footers and about:blank */
+                        * { margin: 0; padding: 0; box-sizing: border-box; }
+                        body { font-family: Arial, sans-serif; background: white; margin: 0; padding: 0; width: 100%; }
+                        .report-card { max-width: 1100px; margin: 0 auto; border: 3px solid #1e3c72; padding: 30px; background: white; position: relative; }
+                        .logo-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #1e3c72; }
+                        .logo-left, .logo-right { width: 100px; height: 100px; display: flex; align-items: center; justify-content: center; }
+                        .logo-left img, .logo-right img { max-width: 100px; max-height: 100px; object-fit: contain; }
+                        .title-section { text-align: center; flex: 1; }
+                        .school-name { font-size: 24px; font-weight: bold; color: #1e3c72; margin-bottom: 5px; }
+                        .management { font-size: 16px; font-weight: bold; margin: 5px 0; }
+                        .report-title { font-size: 22px; font-weight: bold; margin: 10px 0; text-decoration: underline; }
+                        .academic-session { font-size: 18px; font-weight: bold; }
+                        .student-info { border: 1px solid black; padding: 15px; margin-bottom: 25px; }
+                        .info-row { display: flex; margin-bottom: 10px; }
+                        .info-label { font-weight: bold; width: 160px; }
+                        .info-value { border-bottom: 1px solid black; flex: 1; margin-right: 30px; min-height: 25px; }
+                        table { width: 100%; border-collapse: collapse; margin-bottom: 25px; }
+                        th { background: #1e3c72; color: white; padding: 12px; border: 1px solid black; font-size: 14px; }
+                        td { border: 1px solid black; padding: 8px; }
+                        .summary-box { border: 1px solid black; padding: 15px; margin-bottom: 25px; background: #f9f9f9; }
+                        .comments-box { border: 1px solid black; padding: 15px; margin-bottom: 30px; }
+                        .signatures { display: flex; justify-content: space-between; margin-top: 50px; }
+                        .signature-item { text-align: center; width: 140px; }
+                        .signature-line { border-top: 2px solid black; margin-bottom: 5px; width: 100%; }
+                        .date { text-align: right; margin-top: 30px; font-size: 14px; }
                         @media print {
-                            @page {
-                                size: A4;
-                                margin: 0.5in;
-                                /* Remove browser-generated headers and footers */
-                                @top-center {
-                                    content: "";
-                                }
-                                @bottom-center {
-                                    content: "";
-                                }
-                                /* Remove any extra space */
-                                margin-top: 0.3in;
-                                margin-bottom: 0.3in;
-                            }
-                            
-                            body { 
-                                margin: 0; 
-                                padding: 0; 
-                                background: white;
-                                width: 100%;
-                                -webkit-print-color-adjust: exact;
-                                print-color-adjust: exact;
-                            }
-                            
-                            .report-card { 
-                                border: 2px solid black; 
-                                box-shadow: none;
-                                page-break-inside: avoid;
-                                margin: 0 auto;
-                                padding: 25px;
-                                max-width: 100%;
-                            }
-                            
-                            th { 
-                                background: #1e3c72 !important; 
-                                color: white !important; 
-                                -webkit-print-color-adjust: exact; 
-                                print-color-adjust: exact; 
-                            }
-                            
-                            /* Ensure no extra pages */
-                            .report-card {
-                                page-break-after: avoid;
-                                page-break-before: avoid;
-                            }
-                            
-                            /* Hide any potential blank elements */
-                            body::before, body::after {
-                                display: none !important;
-                                content: none !important;
-                            }
+                            @page { size: A4; margin: 0.5in; @top-center { content: ""; } @bottom-center { content: ""; } }
+                            body { margin: 0; padding: 0; background: white; width: 100%; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+                            .report-card { border: 2px solid black; page-break-inside: avoid; margin: 0 auto; padding: 25px; }
+                            th { background: #1e3c72 !important; color: white !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
                         }
                     </style>
                 </head>
                 <body>
                     <div class="report-card">
-                        <!-- Header with Two Logos - ONLY APPEARS IN PDF/PRINT -->
                         <div class="logo-header">
-                            <!-- Left Logo -->
                             <div class="logo-left">
-                                ${leftLogoUrl !== 'YOUR_LEFT_LOGO_URL_HERE' ? 
-                                    `<img src="${leftLogoUrl}" alt="School Logo" style="display:block; max-width:100px; max-height:100px;">` : 
-                                    '<div style="width:100px; height:100px;"></div>'}
+                                ${leftLogoUrl !== 'YOUR_LEFT_LOGO_URL_HERE' ? `<img src="${leftLogoUrl}" alt="School Logo">` : ''}
                             </div>
-                            
-                            <!-- Title Section -->
                             <div class="title-section">
                                 <div class="school-name">GGHS BENAZIR DISTRICT SCHOOL NAWABSHAH-1</div>
                                 <div class="management">Under the Management of SZABIST Zab-ed</div>
                                 <div class="report-title">${term.toUpperCase()} REPORT CARD</div>
                                 <div class="academic-session">Academic Session 2025-26</div>
                             </div>
-                            
-                            <!-- Right Logo -->
                             <div class="logo-right">
-                                ${rightLogoUrl !== 'YOUR_RIGHT_LOGO_URL_HERE' ? 
-                                    `<img src="${rightLogoUrl}" alt="Institution Logo" style="display:block; max-width:100px; max-height:100px;">` : 
-                                    '<div style="width:100px; height:100px;"></div>'}
+                                ${rightLogoUrl !== 'YOUR_RIGHT_LOGO_URL_HERE' ? `<img src="${rightLogoUrl}" alt="Institution Logo">` : ''}
                             </div>
                         </div>
 
-                        <!-- Student Information -->
                         <div class="student-info">
                             <div class="info-row">
                                 <span class="info-label">Student's Name:</span>
@@ -1187,7 +1260,6 @@
                             </div>
                         </div>
 
-                        <!-- Subjects Table -->
                         <table>
                             <thead>
                                 <tr>
@@ -1205,19 +1277,16 @@
                             </tbody>
                         </table>
 
-                        <!-- Summary -->
                         <div class="summary-box">
                             <div><strong>Overall Obtained Marks (out of ${totalMarksSum}):</strong> ${totalObtained}</div>
                             <div style="margin-top: 5px;"><strong>Percentage%:</strong> ${overallPercentage}% &nbsp;&nbsp;&nbsp; <strong>Grade:</strong> ${overallGrade}</div>
                         </div>
 
-                        <!-- Comments -->
                         <div class="comments-box">
                             <div><strong>Class Teacher's Comments:</strong></div>
                             <div style="margin-top: 10px; font-style: italic;">${teacherComments}</div>
                         </div>
 
-                        <!-- Signatures -->
                         <div class="signatures">
                             <div class="signature-item">
                                 <div class="signature-line"></div>
@@ -1237,7 +1306,6 @@
                             </div>
                         </div>
 
-                        <!-- Date -->
                         <div class="date">
                             Date: ${new Date().toLocaleDateString()}
                         </div>
@@ -1299,97 +1367,6 @@
             showMessage('Form cleared', 'success');
         }
 
-        // =============================================
-        // FIXED SEARCH FUNCTIONS
-        // =============================================
-        
-        // 1. FIXED SEARCH: Now loads data and switches view
-        function searchStudent() {
-            const rollNo = document.getElementById('searchRollNo').value.trim();
-            if (!rollNo) {
-                showMessage('Please enter a roll number', 'error');
-                return;
-            }
-
-            try {
-                const savedData = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-                // Find the latest record with this roll number
-                const student = savedData
-                    .filter(s => s.rollNumber == rollNo)
-                    .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))[0];
-
-                if (student) {
-                    loadStudentData(student); // This fills the form
-                    showTab('input');        // Switch to the input tab to see the data
-                    showMessage(`Loaded data for ${student.studentName}`, 'success');
-                } else {
-                    showMessage('No student found with this roll number', 'error');
-                }
-            } catch (e) {
-                showMessage('Search error: ' + e.message, 'error');
-            }
-        }
-
-        // 2. FIXED VIEW ALL: Shows table of all saved students
-        function viewAllStudents() {
-            const savedData = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-            
-            if (savedData.length === 0) {
-                document.getElementById('searchResults').innerHTML = '<div class="message info">No saved records found.</div>';
-                return;
-            }
-
-            // Sort by newest first
-            const sorted = [...savedData].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-            
-            let html = `
-                <table class="results-table">
-                    <thead>
-                        <tr>
-                            <th>Roll No</th>
-                            <th>Student Name</th>
-                            <th>Father's Name</th>
-                            <th>Class</th>
-                            <th>Date</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-            `;
-
-            sorted.forEach((student, index) => {
-                const date = student.timestamp ? new Date(student.timestamp).toLocaleDateString() : 'N/A';
-                html += `
-                    <tr>
-                        <td>${student.rollNumber || 'N/A'}</td>
-                        <td>${student.studentName || 'N/A'}</td>
-                        <td>${student.fatherName || 'N/A'}</td>
-                        <td>${student.studentClass || 'N/A'}</td>
-                        <td>${date}</td>
-                        <td>
-                            <button class="load-btn" onclick='loadStudentByIndex(${index})'>Load</button>
-                        </td>
-                    </tr>
-                `;
-            });
-
-            html += '</tbody></table>';
-            document.getElementById('searchResults').innerHTML = html;
-        }
-
-        // Helper to load student by index from sorted array
-        function loadStudentByIndex(index) {
-            const savedData = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-            const sorted = [...savedData].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-            const student = sorted[index];
-            
-            if (student) {
-                loadStudentData(student);
-                showTab('input');
-                showMessage(`Loaded ${student.studentName}`, 'success');
-            }
-        }
-
         // Load student data into form
         function loadStudentData(student) {
             document.getElementById('termName').value = student.term || '1st Term';
@@ -1426,18 +1403,8 @@
             } else {
                 loadSubjects();
             }
-        }
-
-        // Save to local storage as backup
-        function saveToLocalStorage(data) {
-            try {
-                const savedData = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-                savedData.push(data);
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(savedData));
-                console.log('Saved to localStorage:', data.rollNumber);
-            } catch (e) {
-                console.error('Error saving to localStorage:', e);
-            }
+            
+            showTab('input');
         }
     </script>
 </body>
