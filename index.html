@@ -626,13 +626,30 @@
         ];
 
         // =============================================
+        // LOCAL STORAGE KEY FOR SEARCH
+        // =============================================
+        const STORAGE_KEY = 'gghs_report_cards';
+
+        // =============================================
         // INITIALIZATION
         // =============================================
         window.onload = function() {
             loadSubjects();
             checkConnection();
             showPreview();
+            initializeStorage();
+            console.log('Search system initialized');
         };
+
+        function initializeStorage() {
+            if (!localStorage.getItem(STORAGE_KEY)) {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify([]));
+                console.log('Local storage initialized');
+            } else {
+                const count = JSON.parse(localStorage.getItem(STORAGE_KEY)).length;
+                console.log('Local storage has', count, 'records');
+            }
+        }
 
         function loadSubjects() {
             const tbody = document.getElementById('subjectsBody');
@@ -732,7 +749,7 @@
         }
 
         // =============================================
-        // SAVE TO GOOGLE SHEET
+        // SAVE TO GOOGLE SHEET (UPDATED WITH LOCAL STORAGE)
         // =============================================
         function saveToSheet() {
             const url = document.getElementById('appsScriptUrl').value;
@@ -785,9 +802,12 @@
             }
 
             setLoading(true);
-            showMessage('Sending data to Google Sheet...', 'info');
+            showMessage('Saving to local storage and sending to Google Sheet...', 'info');
 
-            // Send to Apps Script
+            // Save to localStorage FIRST (for search functionality)
+            saveToLocalStorage(data);
+
+            // Then send to Google Sheets
             fetch(url, {
                 method: 'POST',
                 mode: 'no-cors',
@@ -798,11 +818,11 @@
             })
             .then(() => {
                 setLoading(false);
-                showMessage('✅ Data sent to Google Sheet! Check your sheet.', 'success');
+                showMessage('✅ Data saved to Google Sheet and local storage!', 'success');
             })
             .catch(error => {
                 setLoading(false);
-                showMessage('❌ Error: ' + error.message, 'error');
+                showMessage('✅ Data saved to local storage only. Sheet error: ' + error.message, 'info');
             });
         }
 
@@ -838,395 +858,394 @@
         }
 
         // =============================================
-// GENERATE PRINTABLE HTML WITH TWO LOGOS (ONLY IN PDF/PRINT)
-// =============================================
-function generatePrintableHTML() {
-    const term = document.getElementById('termName').value || '1st Term';
-    const studentName = document.getElementById('studentName').value || 'Aleshka';
-    const fatherName = document.getElementById('fatherName').value || 'Mustafa';
-    const studentClass = document.getElementById('studentClass').value || 'VII';
-    const rollNo = document.getElementById('rollNumber').value || '43';
-    const daysAttended = document.getElementById('daysAttended').value || '20';
-    const totalDays = document.getElementById('totalWorkingDays').value || '126';
-    const teacherComments = document.getElementById('teacherComments').value || 'Needs focus attention and consistent practice';
-    
-    // =============================================
-    // IMPORTANT: REPLACE THESE WITH YOUR LOGO URLs
-    // AFTER UPLOADING TO GITHUB
-    // =============================================
-    const leftLogoUrl = 'https://raw.githubusercontent.com/penbeam/bds-report-cards/226b18442780cec5aff3c4de43dc445df08f3fe6/images/SZABIST_LOGO.png';   // Replace with your left logo URL
-    const rightLogoUrl = 'https://raw.githubusercontent.com/penbeam/bds-report-cards/226b18442780cec5aff3c4de43dc445df08f3fe6/images/BDS-Logo.png'; // Replace with your right logo URL
-    
-    let totalMarksSum = 0;
-    let totalObtained = 0;
-    let subjectsHTML = '';
+        // GENERATE PRINTABLE HTML WITH TWO LOGOS (ONLY IN PDF/PRINT)
+        // =============================================
+        function generatePrintableHTML() {
+            const term = document.getElementById('termName').value || '1st Term';
+            const studentName = document.getElementById('studentName').value || 'Aleshka';
+            const fatherName = document.getElementById('fatherName').value || 'Mustafa';
+            const studentClass = document.getElementById('studentClass').value || 'VII';
+            const rollNo = document.getElementById('rollNumber').value || '43';
+            const daysAttended = document.getElementById('daysAttended').value || '20';
+            const totalDays = document.getElementById('totalWorkingDays').value || '126';
+            const teacherComments = document.getElementById('teacherComments').value || 'Needs focus attention and consistent practice';
+            
+            // =============================================
+            // IMPORTANT: REPLACE THESE WITH YOUR LOGO URLs
+            // AFTER UPLOADING TO GITHUB
+            // =============================================
+            const leftLogoUrl = 'https://raw.githubusercontent.com/penbeam/bds-report-cards/226b18442780cec5aff3c4de43dc445df08f3fe6/images/SZABIST_LOGO.png';
+            const rightLogoUrl = 'https://raw.githubusercontent.com/penbeam/bds-report-cards/226b18442780cec5aff3c4de43dc445df08f3fe6/images/BDS-Logo.png';
+            
+            let totalMarksSum = 0;
+            let totalObtained = 0;
+            let subjectsHTML = '';
 
-    const rows = document.getElementById('subjectsBody').rows;
-    for (let i = 0; i < rows.length; i++) {
-        const inputs = rows[i].getElementsByTagName('input');
-        const subject = inputs[0].value || '______';
-        const total = inputs[1].value || '0';
-        const obtained = inputs[2].value || '0';
-        const percentage = rows[i].cells[3].innerHTML;
-        const grade = rows[i].cells[4].innerHTML;
-        const remarks = inputs[3].value || '';
-        
-        subjectsHTML += `
-            <tr>
-                <td style="border: 1px solid black; padding: 8px; text-align: left;">${subject}</td>
-                <td style="border: 1px solid black; padding: 8px; text-align: center;">${total}</td>
-                <td style="border: 1px solid black; padding: 8px; text-align: center;">${obtained}</td>
-                <td style="border: 1px solid black; padding: 8px; text-align: center;">${percentage}</td>
-                <td style="border: 1px solid black; padding: 8px; text-align: center;">${grade}</td>
-                <td style="border: 1px solid black; padding: 8px; text-align: left;">${remarks}</td>
-                <td style="border: 1px solid black; padding: 8px; text-align: center;"></td>
-            </tr>
-        `;
+            const rows = document.getElementById('subjectsBody').rows;
+            for (let i = 0; i < rows.length; i++) {
+                const inputs = rows[i].getElementsByTagName('input');
+                const subject = inputs[0].value || '______';
+                const total = inputs[1].value || '0';
+                const obtained = inputs[2].value || '0';
+                const percentage = rows[i].cells[3].innerHTML;
+                const grade = rows[i].cells[4].innerHTML;
+                const remarks = inputs[3].value || '';
+                
+                subjectsHTML += `
+                    <tr>
+                        <td style="border: 1px solid black; padding: 8px; text-align: left;">${subject}</td>
+                        <td style="border: 1px solid black; padding: 8px; text-align: center;">${total}</td>
+                        <td style="border: 1px solid black; padding: 8px; text-align: center;">${obtained}</td>
+                        <td style="border: 1px solid black; padding: 8px; text-align: center;">${percentage}</td>
+                        <td style="border: 1px solid black; padding: 8px; text-align: center;">${grade}</td>
+                        <td style="border: 1px solid black; padding: 8px; text-align: left;">${remarks}</td>
+                        <td style="border: 1px solid black; padding: 8px; text-align: center;"></td>
+                    </tr>
+                `;
 
-        if (obtained.toUpperCase() !== 'A') {
-            totalMarksSum += parseFloat(total) || 0;
-            totalObtained += parseFloat(obtained) || 0;
-        } else {
-            totalMarksSum += parseFloat(total) || 0;
+                if (obtained.toUpperCase() !== 'A') {
+                    totalMarksSum += parseFloat(total) || 0;
+                    totalObtained += parseFloat(obtained) || 0;
+                } else {
+                    totalMarksSum += parseFloat(total) || 0;
+                }
+            }
+
+            const overallPercentage = totalMarksSum > 0 ? ((totalObtained / totalMarksSum) * 100).toFixed(0) : 0;
+            let overallGrade = 'F';
+            if (overallPercentage >= 90) overallGrade = 'A+';
+            else if (overallPercentage >= 80) overallGrade = 'A';
+            else if (overallPercentage >= 70) overallGrade = 'B';
+            else if (overallPercentage >= 60) overallGrade = 'C';
+            else if (overallPercentage >= 50) overallGrade = 'D';
+            else if (overallPercentage >= 40) overallGrade = 'E';
+
+            return `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>GGHS Benazir - Report Card</title>
+                    <style>
+                        /* RESET ALL MARGINS AND PADDING */
+                        * {
+                            margin: 0;
+                            padding: 0;
+                            box-sizing: border-box;
+                        }
+                        
+                        body {
+                            font-family: Arial, sans-serif;
+                            background: white;
+                            margin: 0;
+                            padding: 0;
+                            width: 100%;
+                        }
+                        
+                        .report-card {
+                            max-width: 1100px;
+                            margin: 0 auto;
+                            border: 3px solid #1e3c72;
+                            padding: 30px;
+                            background: white;
+                            position: relative;
+                        }
+                        
+                        /* Header with two logos */
+                        .logo-header {
+                            display: flex;
+                            align-items: center;
+                            justify-content: space-between;
+                            margin-bottom: 20px;
+                            padding-bottom: 15px;
+                            border-bottom: 2px solid #1e3c72;
+                        }
+                        
+                        .logo-left, .logo-right {
+                            width: 100px;
+                            height: 100px;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                        }
+                        
+                        .logo-left img, .logo-right img {
+                            max-width: 100px;
+                            max-height: 100px;
+                            object-fit: contain;
+                        }
+                        
+                        .title-section {
+                            text-align: center;
+                            flex: 1;
+                        }
+                        
+                        .school-name {
+                            font-size: 24px;
+                            font-weight: bold;
+                            color: #1e3c72;
+                            margin-bottom: 5px;
+                        }
+                        
+                        .management {
+                            font-size: 16px;
+                            font-weight: bold;
+                            margin: 5px 0;
+                        }
+                        
+                        .report-title {
+                            font-size: 22px;
+                            font-weight: bold;
+                            margin: 10px 0;
+                            text-decoration: underline;
+                        }
+                        
+                        .academic-session {
+                            font-size: 18px;
+                            font-weight: bold;
+                        }
+                        
+                        .student-info {
+                            border: 1px solid black;
+                            padding: 15px;
+                            margin-bottom: 25px;
+                        }
+                        
+                        .info-row {
+                            display: flex;
+                            margin-bottom: 10px;
+                        }
+                        
+                        .info-label {
+                            font-weight: bold;
+                            width: 160px;
+                        }
+                        
+                        .info-value {
+                            border-bottom: 1px solid black;
+                            flex: 1;
+                            margin-right: 30px;
+                            min-height: 25px;
+                        }
+                        
+                        table {
+                            width: 100%;
+                            border-collapse: collapse;
+                            margin-bottom: 25px;
+                        }
+                        
+                        th {
+                            background: #1e3c72;
+                            color: white;
+                            padding: 12px;
+                            border: 1px solid black;
+                            font-size: 14px;
+                        }
+                        
+                        td {
+                            border: 1px solid black;
+                            padding: 8px;
+                        }
+                        
+                        .summary-box {
+                            border: 1px solid black;
+                            padding: 15px;
+                            margin-bottom: 25px;
+                            background: #f9f9f9;
+                        }
+                        
+                        .comments-box {
+                            border: 1px solid black;
+                            padding: 15px;
+                            margin-bottom: 30px;
+                        }
+                        
+                        .signatures {
+                            display: flex;
+                            justify-content: space-between;
+                            margin-top: 50px;
+                        }
+                        
+                        .signature-item {
+                            text-align: center;
+                            width: 140px;
+                        }
+                        
+                        .signature-line {
+                            border-top: 2px solid black;
+                            margin-bottom: 5px;
+                            width: 100%;
+                        }
+                        
+                        .date {
+                            text-align: right;
+                            margin-top: 30px;
+                            font-size: 14px;
+                        }
+                        
+                        /* CRITICAL FIX: Remove browser headers/footers and about:blank */
+                        @media print {
+                            @page {
+                                size: A4;
+                                margin: 0.5in;
+                                /* Remove browser-generated headers and footers */
+                                @top-center {
+                                    content: "";
+                                }
+                                @bottom-center {
+                                    content: "";
+                                }
+                                /* Remove any extra space */
+                                margin-top: 0.3in;
+                                margin-bottom: 0.3in;
+                            }
+                            
+                            body { 
+                                margin: 0; 
+                                padding: 0; 
+                                background: white;
+                                width: 100%;
+                                -webkit-print-color-adjust: exact;
+                                print-color-adjust: exact;
+                            }
+                            
+                            .report-card { 
+                                border: 2px solid black; 
+                                box-shadow: none;
+                                page-break-inside: avoid;
+                                margin: 0 auto;
+                                padding: 25px;
+                                max-width: 100%;
+                            }
+                            
+                            th { 
+                                background: #1e3c72 !important; 
+                                color: white !important; 
+                                -webkit-print-color-adjust: exact; 
+                                print-color-adjust: exact; 
+                            }
+                            
+                            /* Ensure no extra pages */
+                            .report-card {
+                                page-break-after: avoid;
+                                page-break-before: avoid;
+                            }
+                            
+                            /* Hide any potential blank elements */
+                            body::before, body::after {
+                                display: none !important;
+                                content: none !important;
+                            }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="report-card">
+                        <!-- Header with Two Logos - ONLY APPEARS IN PDF/PRINT -->
+                        <div class="logo-header">
+                            <!-- Left Logo -->
+                            <div class="logo-left">
+                                ${leftLogoUrl !== 'YOUR_LEFT_LOGO_URL_HERE' ? 
+                                    `<img src="${leftLogoUrl}" alt="School Logo" style="display:block; max-width:100px; max-height:100px;">` : 
+                                    '<div style="width:100px; height:100px;"></div>'}
+                            </div>
+                            
+                            <!-- Title Section -->
+                            <div class="title-section">
+                                <div class="school-name">GGHS BENAZIR DISTRICT SCHOOL NAWABSHAH-1</div>
+                                <div class="management">Under the Management of SZABIST Zab-ed</div>
+                                <div class="report-title">${term.toUpperCase()} REPORT CARD</div>
+                                <div class="academic-session">Academic Session 2025-26</div>
+                            </div>
+                            
+                            <!-- Right Logo -->
+                            <div class="logo-right">
+                                ${rightLogoUrl !== 'YOUR_RIGHT_LOGO_URL_HERE' ? 
+                                    `<img src="${rightLogoUrl}" alt="Institution Logo" style="display:block; max-width:100px; max-height:100px;">` : 
+                                    '<div style="width:100px; height:100px;"></div>'}
+                            </div>
+                        </div>
+
+                        <!-- Student Information -->
+                        <div class="student-info">
+                            <div class="info-row">
+                                <span class="info-label">Student's Name:</span>
+                                <span class="info-value">${studentName}</span>
+                                <span class="info-label">Father's Name:</span>
+                                <span class="info-value">${fatherName}</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Class/Section:</span>
+                                <span class="info-value">${studentClass}</span>
+                                <span class="info-label">Roll No:</span>
+                                <span class="info-value">${rollNo}</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Days Attended:</span>
+                                <span class="info-value">${daysAttended}</span>
+                                <span class="info-label">Total Working Days (${term}):</span>
+                                <span class="info-value">${totalDays}</span>
+                            </div>
+                        </div>
+
+                        <!-- Subjects Table -->
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Subject</th>
+                                    <th>Total Marks</th>
+                                    <th>Marks Obtained</th>
+                                    <th>%</th>
+                                    <th>Grade</th>
+                                    <th>Subject Teacher's Remarks</th>
+                                    <th>Teacher's Sign</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${subjectsHTML}
+                            </tbody>
+                        </table>
+
+                        <!-- Summary -->
+                        <div class="summary-box">
+                            <div><strong>Overall Obtained Marks (out of ${totalMarksSum}):</strong> ${totalObtained}</div>
+                            <div style="margin-top: 5px;"><strong>Percentage%:</strong> ${overallPercentage}% &nbsp;&nbsp;&nbsp; <strong>Grade:</strong> ${overallGrade}</div>
+                        </div>
+
+                        <!-- Comments -->
+                        <div class="comments-box">
+                            <div><strong>Class Teacher's Comments:</strong></div>
+                            <div style="margin-top: 10px; font-style: italic;">${teacherComments}</div>
+                        </div>
+
+                        <!-- Signatures -->
+                        <div class="signatures">
+                            <div class="signature-item">
+                                <div class="signature-line"></div>
+                                <div>Class Teacher Sign</div>
+                            </div>
+                            <div class="signature-item">
+                                <div class="signature-line"></div>
+                                <div>Coordinator Sign</div>
+                            </div>
+                            <div class="signature-item">
+                                <div class="signature-line"></div>
+                                <div>Head Mistress Sign</div>
+                            </div>
+                            <div class="signature-item">
+                                <div class="signature-line"></div>
+                                <div>Parent Sign</div>
+                            </div>
+                        </div>
+
+                        <!-- Date -->
+                        <div class="date">
+                            Date: ${new Date().toLocaleDateString()}
+                        </div>
+                    </div>
+                </body>
+                </html>
+            `;
         }
-    }
-
-    const overallPercentage = totalMarksSum > 0 ? ((totalObtained / totalMarksSum) * 100).toFixed(0) : 0;
-    let overallGrade = 'F';
-    if (overallPercentage >= 90) overallGrade = 'A+';
-    else if (overallPercentage >= 80) overallGrade = 'A';
-    else if (overallPercentage >= 70) overallGrade = 'B';
-    else if (overallPercentage >= 60) overallGrade = 'C';
-    else if (overallPercentage >= 50) overallGrade = 'D';
-    else if (overallPercentage >= 40) overallGrade = 'E';
-
-    return `
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <title>GGHS Benazir - Report Card</title>
-            <style>
-                /* RESET ALL MARGINS AND PADDING */
-                * {
-                    margin: 0;
-                    padding: 0;
-                    box-sizing: border-box;
-                }
-                
-                body {
-                    font-family: Arial, sans-serif;
-                    background: white;
-                    margin: 0;
-                    padding: 0;
-                    width: 100%;
-                }
-                
-                .report-card {
-                    max-width: 1100px;
-                    margin: 0 auto;
-                    border: 3px solid #1e3c72;
-                    padding: 30px;
-                    background: white;
-                    position: relative;
-                }
-                
-                /* Header with two logos */
-                .logo-header {
-                    display: flex;
-                    align-items: center;
-                    justify-content: space-between;
-                    margin-bottom: 20px;
-                    padding-bottom: 15px;
-                    border-bottom: 2px solid #1e3c72;
-                }
-                
-                .logo-left, .logo-right {
-                    width: 100px;
-                    height: 100px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                }
-                
-                .logo-left img, .logo-right img {
-                    max-width: 100px;
-                    max-height: 100px;
-                    object-fit: contain;
-                }
-                
-                .title-section {
-                    text-align: center;
-                    flex: 1;
-                }
-                
-                .school-name {
-                    font-size: 24px;
-                    font-weight: bold;
-                    color: #1e3c72;
-                    margin-bottom: 5px;
-                }
-                
-                .management {
-                    font-size: 16px;
-                    font-weight: bold;
-                    margin: 5px 0;
-                }
-                
-                .report-title {
-                    font-size: 22px;
-                    font-weight: bold;
-                    margin: 10px 0;
-                    text-decoration: underline;
-                }
-                
-                .academic-session {
-                    font-size: 18px;
-                    font-weight: bold;
-                }
-                
-                .student-info {
-                    border: 1px solid black;
-                    padding: 15px;
-                    margin-bottom: 25px;
-                }
-                
-                .info-row {
-                    display: flex;
-                    margin-bottom: 10px;
-                }
-                
-                .info-label {
-                    font-weight: bold;
-                    width: 160px;
-                }
-                
-                .info-value {
-                    border-bottom: 1px solid black;
-                    flex: 1;
-                    margin-right: 30px;
-                    min-height: 25px;
-                }
-                
-                table {
-                    width: 100%;
-                    border-collapse: collapse;
-                    margin-bottom: 25px;
-                }
-                
-                th {
-                    background: #1e3c72;
-                    color: white;
-                    padding: 12px;
-                    border: 1px solid black;
-                    font-size: 14px;
-                }
-                
-                td {
-                    border: 1px solid black;
-                    padding: 8px;
-                }
-                
-                .summary-box {
-                    border: 1px solid black;
-                    padding: 15px;
-                    margin-bottom: 25px;
-                    background: #f9f9f9;
-                }
-                
-                .comments-box {
-                    border: 1px solid black;
-                    padding: 15px;
-                    margin-bottom: 30px;
-                }
-                
-                .signatures {
-                    display: flex;
-                    justify-content: space-between;
-                    margin-top: 50px;
-                }
-                
-                .signature-item {
-                    text-align: center;
-                    width: 140px;
-                }
-                
-                .signature-line {
-                    border-top: 2px solid black;
-                    margin-bottom: 5px;
-                    width: 100%;
-                }
-                
-                .date {
-                    text-align: right;
-                    margin-top: 30px;
-                    font-size: 14px;
-                }
-                
-                /* CRITICAL FIX: Remove browser headers/footers and about:blank */
-                @media print {
-                    @page {
-                        size: A4;
-                        margin: 0.5in;
-                        /* Remove browser-generated headers and footers */
-                        @top-center {
-                            content: "";
-                        }
-                        @bottom-center {
-                            content: "";
-                        }
-                        /* Remove any extra space */
-                        margin-top: 0.3in;
-                        margin-bottom: 0.3in;
-                    }
-                    
-                    body { 
-                        margin: 0; 
-                        padding: 0; 
-                        background: white;
-                        width: 100%;
-                        -webkit-print-color-adjust: exact;
-                        print-color-adjust: exact;
-                    }
-                    
-                    .report-card { 
-                        border: 2px solid black; 
-                        box-shadow: none;
-                        page-break-inside: avoid;
-                        margin: 0 auto;
-                        padding: 25px;
-                        max-width: 100%;
-                    }
-                    
-                    th { 
-                        background: #1e3c72 !important; 
-                        color: white !important; 
-                        -webkit-print-color-adjust: exact; 
-                        print-color-adjust: exact; 
-                    }
-                    
-                    /* Ensure no extra pages */
-                    .report-card {
-                        page-break-after: avoid;
-                        page-break-before: avoid;
-                    }
-                    
-                    /* Hide any potential blank elements */
-                    body::before, body::after {
-                        display: none !important;
-                        content: none !important;
-                    }
-                }
-            </style>
-        </head>
-        <body>
-            <div class="report-card">
-                <!-- Header with Two Logos - ONLY APPEARS IN PDF/PRINT -->
-                <div class="logo-header">
-                    <!-- Left Logo -->
-                    <div class="logo-left">
-                        ${leftLogoUrl !== 'YOUR_LEFT_LOGO_URL_HERE' ? 
-                            `<img src="${leftLogoUrl}" alt="School Logo" style="display:block; max-width:100px; max-height:100px;">` : 
-                            '<div style="width:100px; height:100px;"></div>'}
-                    </div>
-                    
-                    <!-- Title Section -->
-                    <div class="title-section">
-                        <div class="school-name">GGHS BENAZIR DISTRICT SCHOOL NAWABSHAH-1</div>
-                        <div class="management">Under the Management of SZABIST Zab-ed</div>
-                        <div class="report-title">${term.toUpperCase()} REPORT CARD</div>
-                        <div class="academic-session">Academic Session 2025-26</div>
-                    </div>
-                    
-                    <!-- Right Logo -->
-                    <div class="logo-right">
-                        ${rightLogoUrl !== 'YOUR_RIGHT_LOGO_URL_HERE' ? 
-                            `<img src="${rightLogoUrl}" alt="Institution Logo" style="display:block; max-width:100px; max-height:100px;">` : 
-                            '<div style="width:100px; height:100px;"></div>'}
-                    </div>
-                </div>
-
-                <!-- Student Information -->
-                <div class="student-info">
-                    <div class="info-row">
-                        <span class="info-label">Student's Name:</span>
-                        <span class="info-value">${studentName}</span>
-                        <span class="info-label">Father's Name:</span>
-                        <span class="info-value">${fatherName}</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Class/Section:</span>
-                        <span class="info-value">${studentClass}</span>
-                        <span class="info-label">Roll No:</span>
-                        <span class="info-value">${rollNo}</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Days Attended:</span>
-                        <span class="info-value">${daysAttended}</span>
-                        <span class="info-label">Total Working Days (${term}):</span>
-                        <span class="info-value">${totalDays}</span>
-                    </div>
-                </div>
-
-                <!-- Subjects Table -->
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Subject</th>
-                            <th>Total Marks</th>
-                            <th>Marks Obtained</th>
-                            <th>%</th>
-                            <th>Grade</th>
-                            <th>Subject Teacher's Remarks</th>
-                            <th>Teacher's Sign</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${subjectsHTML}
-                    </tbody>
-                </table>
-
-                <!-- Summary -->
-                <div class="summary-box">
-                    <div><strong>Overall Obtained Marks (out of ${totalMarksSum}):</strong> ${totalObtained}</div>
-                    <div style="margin-top: 5px;"><strong>Percentage%:</strong> ${overallPercentage}% &nbsp;&nbsp;&nbsp; <strong>Grade:</strong> ${overallGrade}</div>
-                </div>
-
-                <!-- Comments -->
-                <div class="comments-box">
-                    <div><strong>Class Teacher's Comments:</strong></div>
-                    <div style="margin-top: 10px; font-style: italic;">${teacherComments}</div>
-                </div>
-
-                <!-- Signatures -->
-                <div class="signatures">
-                    <div class="signature-item">
-                        <div class="signature-line"></div>
-                        <div>Class Teacher Sign</div>
-                    </div>
-                    <div class="signature-item">
-                        <div class="signature-line"></div>
-                        <div>Coordinator Sign</div>
-                    </div>
-                    <div class="signature-item">
-                        <div class="signature-line"></div>
-                        <div>Head Mistress Sign</div>
-                    </div>
-                    <div class="signature-item">
-                        <div class="signature-line"></div>
-                        <div>Parent Sign</div>
-                    </div>
-                </div>
-
-                <!-- Date -->
-                <div class="date">
-                    Date: ${new Date().toLocaleDateString()}
-                </div>
-            </div>
-
-        </body>
-        </html>
-    `;
-}
 
         // =============================================
         // SHOW PREVIEW
@@ -1281,102 +1300,179 @@ function generatePrintableHTML() {
         }
 
         // =============================================
-        // SEARCH FUNCTIONS (Simple local storage version)
+        // FIXED SEARCH FUNCTIONS
         // =============================================
-        const STORAGE_KEY = 'gghs_report_cards';
-
         function searchStudent() {
-            const rollNo = document.getElementById('searchRollNo').value;
+            const rollNo = document.getElementById('searchRollNo').value.trim();
             if (!rollNo) {
                 showMessage('Please enter a roll number', 'error');
                 return;
             }
 
-            const savedData = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-            const results = savedData.filter(s => s.rollNumber === rollNo);
-            
-            if (results.length > 0) {
-                displaySearchResults(results);
-            } else {
-                showMessage('No student found with roll number: ' + rollNo, 'error');
+            try {
+                const savedData = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+                console.log('Searching for roll no:', rollNo);
+                console.log('Total records:', savedData.length);
+                
+                // Find all entries with matching roll number (get the latest)
+                const results = savedData
+                    .filter(s => s.rollNumber === rollNo)
+                    .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+                
+                if (results.length > 0) {
+                    displaySearchResults([results[0]]); // Show only the latest
+                    showMessage(`Found ${results.length} record(s)`, 'success');
+                } else {
+                    showMessage('No student found with roll number: ' + rollNo, 'error');
+                    document.getElementById('searchResults').innerHTML = '<div class="message error">No records found</div>';
+                }
+            } catch (e) {
+                console.error('Search error:', e);
+                showMessage('Error searching: ' + e.message, 'error');
             }
         }
 
         function viewAllStudents() {
-            const savedData = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-            if (savedData.length > 0) {
-                displaySearchResults(savedData.slice(-10).reverse());
-            } else {
-                showMessage('No saved students found', 'info');
+            try {
+                const savedData = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+                console.log('Total records in storage:', savedData.length);
+                
+                if (savedData.length > 0) {
+                    // Sort by newest first and take last 10
+                    const recent = savedData
+                        .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+                        .slice(0, 10);
+                    displaySearchResults(recent);
+                    showMessage(`Showing ${recent.length} most recent records`, 'success');
+                } else {
+                    document.getElementById('searchResults').innerHTML = '<div class="message info">No saved students found</div>';
+                }
+            } catch (e) {
+                console.error('View all error:', e);
+                showMessage('Error loading records: ' + e.message, 'error');
             }
         }
 
         function displaySearchResults(students) {
             const div = document.getElementById('searchResults');
-            let html = '<table class="results-table"><tr><th>Name</th><th>Father</th><th>Class</th><th>Roll No</th><th>Date</th><th>Action</th></tr>';
+            
+            if (!students || students.length === 0) {
+                div.innerHTML = '<div class="message error">No students found</div>';
+                return;
+            }
+            
+            let html = `
+                <table class="results-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Father</th>
+                            <th>Class</th>
+                            <th>Roll No</th>
+                            <th>Date</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
             
             students.forEach(s => {
-                const date = new Date(s.timestamp).toLocaleDateString();
+                const date = s.timestamp ? new Date(s.timestamp).toLocaleDateString() : 'N/A';
                 html += `
                     <tr>
-                        <td>${s.studentName}</td>
-                        <td>${s.fatherName}</td>
-                        <td>${s.studentClass}</td>
-                        <td>${s.rollNumber}</td>
+                        <td>${escapeHtml(s.studentName) || 'N/A'}</td>
+                        <td>${escapeHtml(s.fatherName) || 'N/A'}</td>
+                        <td>${escapeHtml(s.studentClass) || 'N/A'}</td>
+                        <td>${escapeHtml(s.rollNumber) || 'N/A'}</td>
                         <td>${date}</td>
-                        <td><button class="load-btn" onclick="loadStudent('${s.rollNumber}')">Load</button></td>
+                        <td><button class="load-btn" onclick="loadStudent('${escapeHtml(s.rollNumber)}', '${s.timestamp}')">Load</button></td>
                     </tr>
                 `;
             });
             
-            html += '</table>';
+            html += `
+                    </tbody>
+                </table>
+            `;
+            
             div.innerHTML = html;
         }
 
-        function loadStudent(rollNo) {
-            const savedData = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-            const student = savedData.find(s => s.rollNumber === rollNo);
-            
-            if (student) {
+        // Helper function to escape HTML
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function loadStudent(rollNo, timestamp) {
+            try {
+                const savedData = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+                
+                // Find the specific record by roll number and timestamp
+                const student = savedData.find(s => s.rollNumber === rollNo && s.timestamp === timestamp);
+                
+                if (!student) {
+                    showMessage('Student record not found', 'error');
+                    return;
+                }
+
+                // Fill form with student data
                 document.getElementById('termName').value = student.term || '1st Term';
-                document.getElementById('studentName').value = student.studentName;
-                document.getElementById('fatherName').value = student.fatherName;
-                document.getElementById('studentClass').value = student.studentClass;
-                document.getElementById('rollNumber').value = student.rollNumber;
-                document.getElementById('daysAttended').value = student.daysAttended;
-                document.getElementById('totalWorkingDays').value = student.totalWorkingDays;
-                document.getElementById('teacherComments').value = student.teacherComments;
+                document.getElementById('studentName').value = student.studentName || '';
+                document.getElementById('fatherName').value = student.fatherName || '';
+                document.getElementById('studentClass').value = student.studentClass || '';
+                document.getElementById('rollNumber').value = student.rollNumber || '';
+                document.getElementById('daysAttended').value = student.daysAttended || '';
+                document.getElementById('totalWorkingDays').value = student.totalWorkingDays || '90';
+                document.getElementById('teacherComments').value = student.teacherComments || 'Needs focus attention and consistent practice';
                 document.getElementById('classTeacherSign').value = student.classTeacherSign || '';
                 document.getElementById('coordinatorSign').value = student.coordinatorSign || '';
                 document.getElementById('headMistressSign').value = student.headMistressSign || '';
                 document.getElementById('parentSign').value = student.parentSign || '';
 
+                // Load subjects
                 const tbody = document.getElementById('subjectsBody');
                 tbody.innerHTML = '';
-                student.subjects.forEach(subj => {
-                    const row = tbody.insertRow();
-                    row.innerHTML = `
-                        <td><input type="text" value="${subj.name}"></td>
-                        <td><input type="number" value="${subj.totalMarks}"></td>
-                        <td><input type="text" value="${subj.marksObtained}"></td>
-                        <td class="percentage-display">${subj.percentage || '-'}</td>
-                        <td class="grade-display">${subj.grade || '-'}</td>
-                        <td><input type="text" value="${subj.remarks || ''}"></td>
-                        <td><input type="text" value="${subj.signature || ''}"></td>
-                        <td><button onclick="this.closest('tr').remove()" style="background:#dc3545; color:white; border:none; padding:5px 10px; border-radius:3px; cursor:pointer;">✖</button></td>
-                    `;
-                });
+                
+                if (student.subjects && student.subjects.length > 0) {
+                    student.subjects.forEach(subj => {
+                        const row = tbody.insertRow();
+                        row.innerHTML = `
+                            <td><input type="text" value="${escapeHtml(subj.name)}"></td>
+                            <td><input type="number" value="${subj.totalMarks}"></td>
+                            <td><input type="text" value="${escapeHtml(subj.marksObtained)}"></td>
+                            <td class="percentage-display">${subj.percentage || '-'}</td>
+                            <td class="grade-display">${subj.grade || '-'}</td>
+                            <td><input type="text" value="${escapeHtml(subj.remarks || '')}"></td>
+                            <td><input type="text" value="${escapeHtml(subj.signature || '')}"></td>
+                            <td><button onclick="this.closest('tr').remove()" style="background:#dc3545; color:white; border:none; padding:5px 10px; border-radius:3px; cursor:pointer;">✖</button></td>
+                        `;
+                    });
+                } else {
+                    loadSubjects();
+                }
                 
                 showTab('input');
                 showMessage('Student loaded successfully!', 'success');
+                
+            } catch (e) {
+                console.error('Load error:', e);
+                showMessage('Error loading student: ' + e.message, 'error');
             }
         }
 
         // Save to local storage as backup
         function saveToLocalStorage(data) {
-            const savedData = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-            savedData.push(data);
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(savedData));
+            try {
+                const savedData = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+                savedData.push(data);
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(savedData));
+                console.log('Saved to localStorage:', data.rollNumber);
+            } catch (e) {
+                console.error('Error saving to localStorage:', e);
+            }
         }
     </script>
 </body>
