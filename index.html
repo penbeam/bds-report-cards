@@ -1222,14 +1222,7 @@ function generatePrintableHTML() {
                     Date: ${new Date().toLocaleDateString()}
                 </div>
             </div>
-            
-            <!-- This empty script tag prevents about:blank -->
-            <script>
-                // Prevent any default browser behavior
-                if (window.print) {
-                    // Do nothing, just ensure the script runs
-                }
-            </script>
+
         </body>
         </html>
     `;
