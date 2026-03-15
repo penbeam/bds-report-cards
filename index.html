@@ -854,8 +854,8 @@ function generatePrintableHTML() {
     // IMPORTANT: REPLACE THESE WITH YOUR LOGO URLs
     // AFTER UPLOADING TO GITHUB
     // =============================================
-    const leftLogoUrl = 'https://raw.githubusercontent.com/penbeam/bds-report-cards/226b18442780cec5aff3c4de43dc445df08f3fe6/images/SZABIST_LOGO.png';   // Replace with your left logo URL
-    const rightLogoUrl = 'https://raw.githubusercontent.com/penbeam/bds-report-cards/226b18442780cec5aff3c4de43dc445df08f3fe6/images/BDS-Logo.png'; // Replace with your right logo URL
+    const leftLogoUrl = 'YOUR_LEFT_LOGO_URL_HERE';   // Replace with your left logo URL
+    const rightLogoUrl = 'YOUR_RIGHT_LOGO_URL_HERE'; // Replace with your right logo URL
     
     let totalMarksSum = 0;
     let totalObtained = 0;
@@ -906,19 +906,30 @@ function generatePrintableHTML() {
         <head>
             <title>GGHS Benazir - Report Card</title>
             <style>
+                /* RESET ALL MARGINS AND PADDING */
+                * {
+                    margin: 0;
+                    padding: 0;
+                    box-sizing: border-box;
+                }
+                
                 body {
                     font-family: Arial, sans-serif;
-                    margin: 30px;
-                    padding: 0;
                     background: white;
+                    margin: 0;
+                    padding: 0;
+                    width: 100%;
                 }
+                
                 .report-card {
                     max-width: 1100px;
                     margin: 0 auto;
                     border: 3px solid #1e3c72;
                     padding: 30px;
                     background: white;
+                    position: relative;
                 }
+                
                 /* Header with two logos */
                 .logo-header {
                     display: flex;
@@ -928,6 +939,7 @@ function generatePrintableHTML() {
                     padding-bottom: 15px;
                     border-bottom: 2px solid #1e3c72;
                 }
+                
                 .logo-left, .logo-right {
                     width: 100px;
                     height: 100px;
@@ -935,59 +947,72 @@ function generatePrintableHTML() {
                     align-items: center;
                     justify-content: center;
                 }
+                
                 .logo-left img, .logo-right img {
                     max-width: 100px;
                     max-height: 100px;
                     object-fit: contain;
                 }
+                
                 .title-section {
                     text-align: center;
                     flex: 1;
                 }
+                
                 .school-name {
                     font-size: 24px;
                     font-weight: bold;
                     color: #1e3c72;
                     margin-bottom: 5px;
                 }
+                
                 .management {
                     font-size: 16px;
                     font-weight: bold;
                     margin: 5px 0;
                 }
+                
                 .report-title {
                     font-size: 22px;
                     font-weight: bold;
                     margin: 10px 0;
                     text-decoration: underline;
                 }
+                
                 .academic-session {
                     font-size: 18px;
                     font-weight: bold;
                 }
+                
                 .student-info {
                     border: 1px solid black;
                     padding: 15px;
                     margin-bottom: 25px;
                 }
+                
                 .info-row {
                     display: flex;
                     margin-bottom: 10px;
                 }
+                
                 .info-label {
                     font-weight: bold;
                     width: 160px;
                 }
+                
                 .info-value {
                     border-bottom: 1px solid black;
                     flex: 1;
                     margin-right: 30px;
+                    min-height: 25px;
                 }
+                
                 table {
                     width: 100%;
                     border-collapse: collapse;
                     margin-bottom: 25px;
                 }
+                
                 th {
                     background: #1e3c72;
                     color: white;
@@ -995,43 +1020,101 @@ function generatePrintableHTML() {
                     border: 1px solid black;
                     font-size: 14px;
                 }
+                
                 td {
                     border: 1px solid black;
                     padding: 8px;
                 }
+                
                 .summary-box {
                     border: 1px solid black;
                     padding: 15px;
                     margin-bottom: 25px;
                     background: #f9f9f9;
                 }
+                
                 .comments-box {
                     border: 1px solid black;
                     padding: 15px;
                     margin-bottom: 30px;
                 }
+                
                 .signatures {
                     display: flex;
                     justify-content: space-between;
                     margin-top: 50px;
                 }
+                
                 .signature-item {
                     text-align: center;
                     width: 140px;
                 }
+                
                 .signature-line {
                     border-top: 2px solid black;
                     margin-bottom: 5px;
+                    width: 100%;
                 }
+                
                 .date {
                     text-align: right;
                     margin-top: 30px;
                     font-size: 14px;
                 }
+                
+                /* CRITICAL FIX: Remove browser headers/footers and about:blank */
                 @media print {
-                    body { margin: 0; padding: 20px; }
-                    .report-card { border: 2px solid black; }
-                    th { background: #1e3c72 !important; color: white !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+                    @page {
+                        size: A4;
+                        margin: 0.5in;
+                        /* Remove browser-generated headers and footers */
+                        @top-center {
+                            content: "";
+                        }
+                        @bottom-center {
+                            content: "";
+                        }
+                        /* Remove any extra space */
+                        margin-top: 0.3in;
+                        margin-bottom: 0.3in;
+                    }
+                    
+                    body { 
+                        margin: 0; 
+                        padding: 0; 
+                        background: white;
+                        width: 100%;
+                        -webkit-print-color-adjust: exact;
+                        print-color-adjust: exact;
+                    }
+                    
+                    .report-card { 
+                        border: 2px solid black; 
+                        box-shadow: none;
+                        page-break-inside: avoid;
+                        margin: 0 auto;
+                        padding: 25px;
+                        max-width: 100%;
+                    }
+                    
+                    th { 
+                        background: #1e3c72 !important; 
+                        color: white !important; 
+                        -webkit-print-color-adjust: exact; 
+                        print-color-adjust: exact; 
+                    }
+                    
+                    /* Ensure no extra pages */
+                    .report-card {
+                        page-break-after: avoid;
+                        page-break-before: avoid;
+                    }
+                    
+                    /* Hide any potential blank elements */
+                    body::before, body::after {
+                        display: none !important;
+                        content: none !important;
+                    }
                 }
             </style>
         </head>
@@ -1062,7 +1145,7 @@ function generatePrintableHTML() {
                     </div>
                 </div>
 
-                <!-- Rest of the report card (same as before) -->
+                <!-- Student Information -->
                 <div class="student-info">
                     <div class="info-row">
                         <span class="info-label">Student's Name:</span>
@@ -1084,6 +1167,7 @@ function generatePrintableHTML() {
                     </div>
                 </div>
 
+                <!-- Subjects Table -->
                 <table>
                     <thead>
                         <tr>
@@ -1101,16 +1185,19 @@ function generatePrintableHTML() {
                     </tbody>
                 </table>
 
+                <!-- Summary -->
                 <div class="summary-box">
                     <div><strong>Overall Obtained Marks (out of ${totalMarksSum}):</strong> ${totalObtained}</div>
                     <div style="margin-top: 5px;"><strong>Percentage%:</strong> ${overallPercentage}% &nbsp;&nbsp;&nbsp; <strong>Grade:</strong> ${overallGrade}</div>
                 </div>
 
+                <!-- Comments -->
                 <div class="comments-box">
                     <div><strong>Class Teacher's Comments:</strong></div>
                     <div style="margin-top: 10px; font-style: italic;">${teacherComments}</div>
                 </div>
 
+                <!-- Signatures -->
                 <div class="signatures">
                     <div class="signature-item">
                         <div class="signature-line"></div>
@@ -1130,10 +1217,19 @@ function generatePrintableHTML() {
                     </div>
                 </div>
 
+                <!-- Date -->
                 <div class="date">
                     Date: ${new Date().toLocaleDateString()}
                 </div>
             </div>
+            
+            <!-- This empty script tag prevents about:blank -->
+            <script>
+                // Prevent any default browser behavior
+                if (window.print) {
+                    // Do nothing, just ensure the script runs
+                }
+            </script>
         </body>
         </html>
     `;
