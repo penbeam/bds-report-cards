@@ -589,7 +589,7 @@
         <div id="tab-search" class="tab-content">
             <div class="card">
                 <h2>🔍 Search Student</h2>
-                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px;">
                     <input type="text" id="searchRollNo" placeholder="Enter Roll Number to search" style="flex: 1; min-width: 250px; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px;">
                     <button class="btn btn-primary" onclick="searchStudent()">🔍 Search</button>
                     <button class="btn btn-info" onclick="viewAllStudents()">📋 View All</button>
@@ -1302,6 +1302,8 @@
         // =============================================
         // FIXED SEARCH FUNCTIONS
         // =============================================
+        
+        // 1. FIXED SEARCH: Now loads data and switches view
         function searchStudent() {
             const rollNo = document.getElementById('searchRollNo').value.trim();
             if (!rollNo) {
@@ -1311,155 +1313,118 @@
 
             try {
                 const savedData = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-                console.log('Searching for roll no:', rollNo);
-                console.log('Total records:', savedData.length);
-                
-                // Find all entries with matching roll number (get the latest)
-                const results = savedData
-                    .filter(s => s.rollNumber === rollNo)
-                    .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-                
-                if (results.length > 0) {
-                    displaySearchResults([results[0]]); // Show only the latest
-                    showMessage(`Found ${results.length} record(s)`, 'success');
+                // Find the latest record with this roll number
+                const student = savedData
+                    .filter(s => s.rollNumber == rollNo)
+                    .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))[0];
+
+                if (student) {
+                    loadStudentData(student); // This fills the form
+                    showTab('input');        // Switch to the input tab to see the data
+                    showMessage(`Loaded data for ${student.studentName}`, 'success');
                 } else {
-                    showMessage('No student found with roll number: ' + rollNo, 'error');
-                    document.getElementById('searchResults').innerHTML = '<div class="message error">No records found</div>';
+                    showMessage('No student found with this roll number', 'error');
                 }
             } catch (e) {
-                console.error('Search error:', e);
-                showMessage('Error searching: ' + e.message, 'error');
+                showMessage('Search error: ' + e.message, 'error');
             }
         }
 
+        // 2. FIXED VIEW ALL: Shows table of all saved students
         function viewAllStudents() {
-            try {
-                const savedData = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-                console.log('Total records in storage:', savedData.length);
-                
-                if (savedData.length > 0) {
-                    // Sort by newest first and take last 10
-                    const recent = savedData
-                        .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
-                        .slice(0, 10);
-                    displaySearchResults(recent);
-                    showMessage(`Showing ${recent.length} most recent records`, 'success');
-                } else {
-                    document.getElementById('searchResults').innerHTML = '<div class="message info">No saved students found</div>';
-                }
-            } catch (e) {
-                console.error('View all error:', e);
-                showMessage('Error loading records: ' + e.message, 'error');
-            }
-        }
-
-        function displaySearchResults(students) {
-            const div = document.getElementById('searchResults');
+            const savedData = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
             
-            if (!students || students.length === 0) {
-                div.innerHTML = '<div class="message error">No students found</div>';
+            if (savedData.length === 0) {
+                document.getElementById('searchResults').innerHTML = '<div class="message info">No saved records found.</div>';
                 return;
             }
+
+            // Sort by newest first
+            const sorted = [...savedData].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
             
             let html = `
                 <table class="results-table">
                     <thead>
                         <tr>
-                            <th>Name</th>
-                            <th>Father</th>
-                            <th>Class</th>
                             <th>Roll No</th>
+                            <th>Student Name</th>
+                            <th>Father's Name</th>
+                            <th>Class</th>
                             <th>Date</th>
                             <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
             `;
-            
-            students.forEach(s => {
-                const date = s.timestamp ? new Date(s.timestamp).toLocaleDateString() : 'N/A';
+
+            sorted.forEach((student, index) => {
+                const date = student.timestamp ? new Date(student.timestamp).toLocaleDateString() : 'N/A';
                 html += `
                     <tr>
-                        <td>${escapeHtml(s.studentName) || 'N/A'}</td>
-                        <td>${escapeHtml(s.fatherName) || 'N/A'}</td>
-                        <td>${escapeHtml(s.studentClass) || 'N/A'}</td>
-                        <td>${escapeHtml(s.rollNumber) || 'N/A'}</td>
+                        <td>${student.rollNumber || 'N/A'}</td>
+                        <td>${student.studentName || 'N/A'}</td>
+                        <td>${student.fatherName || 'N/A'}</td>
+                        <td>${student.studentClass || 'N/A'}</td>
                         <td>${date}</td>
-                        <td><button class="load-btn" onclick="loadStudent('${escapeHtml(s.rollNumber)}', '${s.timestamp}')">Load</button></td>
+                        <td>
+                            <button class="load-btn" onclick='loadStudentByIndex(${index})'>Load</button>
+                        </td>
                     </tr>
                 `;
             });
-            
-            html += `
-                    </tbody>
-                </table>
-            `;
-            
-            div.innerHTML = html;
+
+            html += '</tbody></table>';
+            document.getElementById('searchResults').innerHTML = html;
         }
 
-        // Helper function to escape HTML
-        function escapeHtml(text) {
-            if (!text) return '';
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-
-        function loadStudent(rollNo, timestamp) {
-            try {
-                const savedData = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-                
-                // Find the specific record by roll number and timestamp
-                const student = savedData.find(s => s.rollNumber === rollNo && s.timestamp === timestamp);
-                
-                if (!student) {
-                    showMessage('Student record not found', 'error');
-                    return;
-                }
-
-                // Fill form with student data
-                document.getElementById('termName').value = student.term || '1st Term';
-                document.getElementById('studentName').value = student.studentName || '';
-                document.getElementById('fatherName').value = student.fatherName || '';
-                document.getElementById('studentClass').value = student.studentClass || '';
-                document.getElementById('rollNumber').value = student.rollNumber || '';
-                document.getElementById('daysAttended').value = student.daysAttended || '';
-                document.getElementById('totalWorkingDays').value = student.totalWorkingDays || '90';
-                document.getElementById('teacherComments').value = student.teacherComments || 'Needs focus attention and consistent practice';
-                document.getElementById('classTeacherSign').value = student.classTeacherSign || '';
-                document.getElementById('coordinatorSign').value = student.coordinatorSign || '';
-                document.getElementById('headMistressSign').value = student.headMistressSign || '';
-                document.getElementById('parentSign').value = student.parentSign || '';
-
-                // Load subjects
-                const tbody = document.getElementById('subjectsBody');
-                tbody.innerHTML = '';
-                
-                if (student.subjects && student.subjects.length > 0) {
-                    student.subjects.forEach(subj => {
-                        const row = tbody.insertRow();
-                        row.innerHTML = `
-                            <td><input type="text" value="${escapeHtml(subj.name)}"></td>
-                            <td><input type="number" value="${subj.totalMarks}"></td>
-                            <td><input type="text" value="${escapeHtml(subj.marksObtained)}"></td>
-                            <td class="percentage-display">${subj.percentage || '-'}</td>
-                            <td class="grade-display">${subj.grade || '-'}</td>
-                            <td><input type="text" value="${escapeHtml(subj.remarks || '')}"></td>
-                            <td><input type="text" value="${escapeHtml(subj.signature || '')}"></td>
-                            <td><button onclick="this.closest('tr').remove()" style="background:#dc3545; color:white; border:none; padding:5px 10px; border-radius:3px; cursor:pointer;">✖</button></td>
-                        `;
-                    });
-                } else {
-                    loadSubjects();
-                }
-                
+        // Helper to load student by index from sorted array
+        function loadStudentByIndex(index) {
+            const savedData = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+            const sorted = [...savedData].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+            const student = sorted[index];
+            
+            if (student) {
+                loadStudentData(student);
                 showTab('input');
-                showMessage('Student loaded successfully!', 'success');
-                
-            } catch (e) {
-                console.error('Load error:', e);
-                showMessage('Error loading student: ' + e.message, 'error');
+                showMessage(`Loaded ${student.studentName}`, 'success');
+            }
+        }
+
+        // Load student data into form
+        function loadStudentData(student) {
+            document.getElementById('termName').value = student.term || '1st Term';
+            document.getElementById('studentName').value = student.studentName || '';
+            document.getElementById('fatherName').value = student.fatherName || '';
+            document.getElementById('studentClass').value = student.studentClass || '';
+            document.getElementById('rollNumber').value = student.rollNumber || '';
+            document.getElementById('daysAttended').value = student.daysAttended || '';
+            document.getElementById('totalWorkingDays').value = student.totalWorkingDays || '90';
+            document.getElementById('teacherComments').value = student.teacherComments || 'Needs focus attention and consistent practice';
+            document.getElementById('classTeacherSign').value = student.classTeacherSign || '';
+            document.getElementById('coordinatorSign').value = student.coordinatorSign || '';
+            document.getElementById('headMistressSign').value = student.headMistressSign || '';
+            document.getElementById('parentSign').value = student.parentSign || '';
+
+            // Load subjects
+            const tbody = document.getElementById('subjectsBody');
+            tbody.innerHTML = '';
+            
+            if (student.subjects && student.subjects.length > 0) {
+                student.subjects.forEach(subj => {
+                    const row = tbody.insertRow();
+                    row.innerHTML = `
+                        <td><input type="text" value="${subj.name || ''}"></td>
+                        <td><input type="number" value="${subj.totalMarks || ''}"></td>
+                        <td><input type="text" value="${subj.marksObtained || ''}"></td>
+                        <td class="percentage-display">${subj.percentage || '-'}</td>
+                        <td class="grade-display">${subj.grade || '-'}</td>
+                        <td><input type="text" value="${subj.remarks || ''}" placeholder="Remarks"></td>
+                        <td><input type="text" value="${subj.signature || ''}" placeholder="Signature"></td>
+                        <td><button onclick="this.closest('tr').remove()" style="background:#dc3545; color:white; border:none; padding:5px 10px; border-radius:3px; cursor:pointer;">✖</button></td>
+                    `;
+                });
+            } else {
+                loadSubjects();
             }
         }
 
