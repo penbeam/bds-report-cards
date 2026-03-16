@@ -900,6 +900,79 @@
                 opacity: 0.8;
             }
         }
+        
+        /* Duplicate warning modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: var(--radius-lg);
+            max-width: 500px;
+            width: 90%;
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .modal-content h3 {
+            color: var(--danger);
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+        
+        .modal-content p {
+            margin-bottom: 10px;
+            color: var(--dark);
+        }
+        
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            justify-content: flex-end;
+        }
+        
+        .modal-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+        
+        .modal-btn.cancel {
+            background: var(--gray-light);
+            color: var(--dark);
+        }
+        
+        .modal-btn.cancel:hover {
+            background: var(--gray);
+            color: white;
+        }
+        
+        .modal-btn.save {
+            background: var(--danger);
+            color: white;
+        }
+        
+        .modal-btn.save:hover {
+            background: #c82333;
+        }
     </style>
 </head>
 <body>
@@ -910,7 +983,6 @@
             <p>Under the Management of SZABIST Zab-ed</p>
         </div>
 
-
         <!-- Apps Script URL Configuration -->
         <div class="url-section">
             <div class="url-label">
@@ -919,6 +991,18 @@
             <div class="url-input-group">
                 <input type="text" id="appsScriptUrl" placeholder="https://script.google.com/macros/s/.../exec" value="https://script.google.com/macros/s/AKfycbyl_KanGZ1sl63hDfHw8kxeFvLvXceVtuqcWAcIms0NkWg6ogrg4uAx5IL1WkGxsnHFrA/exec">
                 <span id="connectionStatus" class="status-badge status-disconnected">🔴 Not Configured</span>
+            </div>
+        </div>
+
+        <!-- Duplicate Warning Modal -->
+        <div id="duplicateModal" class="modal">
+            <div class="modal-content">
+                <h3>⚠️ Duplicate Roll Number Found!</h3>
+                <p>A student with roll number <strong id="dupRollNo"></strong> already exists.</p>
+                <p>Please use a different roll number or search for the existing student to update.</p>
+                <div class="modal-actions">
+                    <button class="modal-btn cancel" onclick="closeDuplicateModal()">OK, I Understand</button>
+                </div>
             </div>
         </div>
 
@@ -981,7 +1065,7 @@
                     </div>
                     <div class="form-group">
                         <label>Roll Number <span class="required">*</span></label>
-                        <input type="text" id="rollNumber" placeholder="Enter roll number" value="43">
+                        <input type="text" id="rollNumber" placeholder="Enter roll number" value="43" onblur="checkDuplicateRollNo()">
                     </div>
                     <div class="form-group">
                         <label>Days Attended</label>
@@ -1249,7 +1333,62 @@
         }
 
         // =============================================
-        // SAVE FUNCTIONS (UPDATED with new fields)
+        // DUPLICATE CHECK FUNCTIONS
+        // =============================================
+        let pendingSaveData = null;
+
+        function showDuplicateModal(rollNo) {
+            document.getElementById('dupRollNo').textContent = rollNo;
+            document.getElementById('duplicateModal').classList.add('active');
+        }
+
+        function closeDuplicateModal() {
+            document.getElementById('duplicateModal').classList.remove('active');
+            pendingSaveData = null;
+        }
+
+        function checkDuplicateRollNumber(rollNumber) {
+            return new Promise((resolve, reject) => {
+                const url = document.getElementById('appsScriptUrl').value;
+                
+                if (!url || url === 'YOUR_APPS_SCRIPT_URL_HERE') {
+                    resolve({ isDuplicate: false }); // Skip check if no URL
+                    return;
+                }
+
+                const callbackName = 'dup_check_' + Date.now();
+                
+                window[callbackName] = function(response) {
+                    delete window[callbackName];
+                    if (response && response.isDuplicate) {
+                        resolve(response);
+                    } else {
+                        resolve({ isDuplicate: false });
+                    }
+                };
+
+                const script = document.createElement('script');
+                script.src = url + '?callback=' + callbackName + '&action=checkDuplicate&rollNumber=' + encodeURIComponent(rollNumber);
+                
+                script.onerror = function() {
+                    delete window[callbackName];
+                    resolve({ isDuplicate: false }); // Assume no duplicate on error
+                };
+
+                document.body.appendChild(script);
+
+                // Timeout
+                setTimeout(() => {
+                    if (window[callbackName]) {
+                        delete window[callbackName];
+                        resolve({ isDuplicate: false });
+                    }
+                }, 5000);
+            });
+        }
+
+        // =============================================
+        // SAVE FUNCTIONS (UPDATED with working duplicate check)
         // =============================================
         function saveToLocalStorage(data) {
             try {
@@ -1263,7 +1402,7 @@
             }
         }
 
-        function saveToSheet() {
+        async function saveToSheet() {
             const url = document.getElementById('appsScriptUrl').value;
             
             if (!url || url === 'YOUR_APPS_SCRIPT_URL_HERE') {
@@ -1279,6 +1418,20 @@
                 }
             }
 
+            const rollNumber = document.getElementById('rollNumber').value;
+            
+            // Check for duplicates
+            setLoading(true);
+            showMessage('Checking for duplicates...', 'info');
+            
+            const duplicateCheck = await checkDuplicateRollNumber(rollNumber);
+            
+            if (duplicateCheck.isDuplicate) {
+                setLoading(false);
+                showDuplicateModal(rollNumber);
+                return;
+            }
+
             // Updated data object with new fields
             const data = {
                 academicSession: document.getElementById('academicSession').value,
@@ -1289,7 +1442,7 @@
                 studentName: document.getElementById('studentName').value,
                 fatherName: document.getElementById('fatherName').value,
                 studentClass: document.getElementById('studentClass').value,
-                rollNumber: document.getElementById('rollNumber').value,
+                rollNumber: rollNumber,
                 daysAttended: document.getElementById('daysAttended').value,
                 totalWorkingDays: document.getElementById('totalWorkingDays').value,
                 teacherComments: document.getElementById('teacherComments').value,
@@ -1315,7 +1468,6 @@
                 });
             }
 
-            setLoading(true);
             showMessage('Saving to Google Sheet...', 'info');
 
             saveToLocalStorage(data);
@@ -1339,88 +1491,89 @@
         }
 
         // =============================================
-// FETCH ALL STUDENTS (IMPROVED - Better error handling)
-// =============================================
-function fetchAllStudents() {
-    const url = document.getElementById('appsScriptUrl').value;
-    
-    if (!url || url === 'YOUR_APPS_SCRIPT_URL_HERE') {
-        showMessage('Please enter your Google Apps Script URL first', 'error');
-        return;
-    }
-
-    setLoading(true);
-    showMessage('Fetching all student records...', 'info');
-
-    // Create a unique callback name
-    const callbackName = 'jsonp_callback_' + Date.now();
-    
-    // Create a promise to handle the JSONP request
-    const fetchPromise = new Promise((resolve, reject) => {
-        // Set a timeout
-        const timeout = setTimeout(() => {
-            cleanup();
-            reject(new Error('Request timeout'));
-        }, 15000);
-
-        // Define the callback function
-        window[callbackName] = function(data) {
-            clearTimeout(timeout);
-            cleanup();
-            if (data && data.error) {
-                reject(new Error(data.error));
-            } else {
-                resolve(data);
+        // FETCH ALL STUDENTS (IMPROVED - Better error handling)
+        // =============================================
+        function fetchAllStudents() {
+            const url = document.getElementById('appsScriptUrl').value;
+            
+            if (!url || url === 'YOUR_APPS_SCRIPT_URL_HERE') {
+                showMessage('Please enter your Google Apps Script URL first', 'error');
+                return;
             }
-        };
 
-        // Cleanup function
-        function cleanup() {
-            delete window[callbackName];
-            if (script && script.parentNode) {
-                script.parentNode.removeChild(script);
-            }
+            setLoading(true);
+            showMessage('Fetching all student records...', 'info');
+
+            // Create a unique callback name
+            const callbackName = 'jsonp_callback_' + Date.now();
+            
+            // Create a promise to handle the JSONP request
+            const fetchPromise = new Promise((resolve, reject) => {
+                // Set a timeout
+                const timeout = setTimeout(() => {
+                    cleanup();
+                    reject(new Error('Request timeout'));
+                }, 15000);
+
+                // Define the callback function
+                window[callbackName] = function(data) {
+                    clearTimeout(timeout);
+                    cleanup();
+                    if (data && data.error) {
+                        reject(new Error(data.error));
+                    } else {
+                        resolve(data);
+                    }
+                };
+
+                // Cleanup function
+                function cleanup() {
+                    delete window[callbackName];
+                    if (script && script.parentNode) {
+                        script.parentNode.removeChild(script);
+                    }
+                }
+
+                // Create script element
+                const script = document.createElement('script');
+                script.src = url + '?callback=' + callbackName;
+                
+                script.onerror = function() {
+                    clearTimeout(timeout);
+                    cleanup();
+                    reject(new Error('Failed to load script'));
+                };
+
+                document.body.appendChild(script);
+            });
+
+            // Handle the promise
+            fetchPromise
+                .then(data => {
+                    if (data && data.students && data.students.length > 0) {
+                        // Store in localStorage
+                        localStorage.setItem(STORAGE_KEY, JSON.stringify(data.students));
+                        
+                        // Populate filters
+                        populateClassFilters(data.students);
+                        
+                        // Display records
+                        displayStudentRecords(data.students);
+                        
+                        showMessage(`✅ Loaded ${data.students.length} student records`, 'success');
+                    } else {
+                        document.getElementById('searchResults').innerHTML = '<div class="message info">No student records found</div>';
+                        showMessage('No records found', 'info');
+                    }
+                    setLoading(false);
+                })
+                .catch(error => {
+                    setLoading(false);
+                    showMessage('❌ Failed to fetch: ' + error.message, 'error');
+                    console.error('Fetch error:', error);
+                });
         }
 
-        // Create script element
-        const script = document.createElement('script');
-        script.src = url + '?callback=' + callbackName;
-        
-        script.onerror = function() {
-            clearTimeout(timeout);
-            cleanup();
-            reject(new Error('Failed to load script'));
-        };
-
-        document.body.appendChild(script);
-    });
-
-    // Handle the promise
-    fetchPromise
-        .then(data => {
-            if (data && data.students && data.students.length > 0) {
-                // Store in localStorage
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(data.students));
-                
-                // Populate filters
-                populateClassFilters(data.students);
-                
-                // Display records
-                displayStudentRecords(data.students);
-                
-                showMessage(`✅ Loaded ${data.students.length} student records`, 'success');
-            } else {
-                document.getElementById('searchResults').innerHTML = '<div class="message info">No student records found</div>';
-                showMessage('No records found', 'info');
-            }
-            setLoading(false);
-        })
-        .catch(error => {
-            setLoading(false);
-            showMessage('❌ Failed to fetch: ' + error.message, 'error');
-            console.error('Fetch error:', error);
-        });
-}
         // =============================================
         // Populate Class Filters
         // =============================================
@@ -2079,6 +2232,39 @@ font-weight: 600;
             loadSubjects();
             showMessage('Form cleared', 'success');
         }
+
+
+// --- DUPLICATE CHECK LOGIC ---
+async function checkDuplicateRollNo() {
+    const rollNo = document.getElementById('rollNumber').value.trim();
+    // This finds the Script URL you pasted in the settings box of your app
+    const scriptUrl = document.getElementById('appsScriptUrl').value;
+
+    // If the box is empty or the URL is missing, do nothing
+    if (!rollNo || !scriptUrl) return;
+
+    try {
+        // This sends a secret message to your Google Sheet to ask: "Does this ID exist?"
+        const response = await fetch(`${scriptUrl}?action=checkDuplicate&rollNo=${rollNo}`);
+        const result = await response.json();
+
+        if (result.exists) {
+            // 1. Show the red warning modal you already have in your HTML
+            document.getElementById('dupRollNo').textContent = rollNo;
+            document.getElementById('duplicateModal').classList.add('active');
+            
+            // 2. Turn the box border red to show an error
+            document.getElementById('rollNumber').style.borderColor = "#dc3545";
+            document.getElementById('rollNumber').style.backgroundColor = "#fff8f8";
+        } else {
+            // If it's not a duplicate, keep the box normal
+            document.getElementById('rollNumber').style.borderColor = "#28a745";
+            document.getElementById('rollNumber').style.backgroundColor = "#ffffff";
+        }
+    } catch (error) {
+        console.error("Duplicate check failed:", error);
+    }
+}
     </script>
 </body>
 </html>
