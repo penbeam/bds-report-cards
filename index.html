@@ -1072,6 +1072,57 @@
         }
     }
 
+/* Mobile-First Pagination Styles */
+@media (max-width: 480px) {
+    .prev-text, .next-text {
+        display: none;
+    }
+    
+    .quick-jump {
+        display: none !important;
+    }
+    
+    button {
+        padding: 10px 14px !important;
+    }
+    
+    select {
+        padding: 6px 8px !important;
+    }
+}
+
+@media (min-width: 481px) and (max-width: 768px) {
+    .quick-jump {
+        display: flex !important;
+    }
+}
+
+@media (min-width: 769px) {
+    .quick-jump {
+        display: flex !important;
+    }
+}
+
+/* Hover effects for buttons */
+.pagination-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(30, 60, 114, 0.15);
+}
+
+.pagination-btn:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+/* Add this to your existing buttons */
+button:not(:disabled) {
+    transition: all 0.2s ease;
+}
+
+button:not(:disabled):hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
 
     </style>
 </head>
@@ -2348,31 +2399,68 @@ function renderCurrentPage() {
         `;
     });
 
-    html += `
-                </tbody>
-            </table>
-        </div>
+    // Pagination Controls - Professional Mobile-First Design
+html += `
+    <!-- Professional Pagination -->
+    <div style="margin-top: 24px; background: white; border-radius: 16px; padding: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #e9ecef;">
         
-        <!-- Pagination Controls -->
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding: 10px; background: var(--light); border-radius: var(--radius-sm);">
-            <div>
-                Showing ${start + 1}-${end} of ${allStudents.length} records
+        <!-- Mobile: Stacked, Desktop: Row -->
+        <div style="display: flex; flex-direction: column; gap: 16px;">
+            
+            <!-- Stats & Per Page Row -->
+            <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span style="background: #e7f5ff; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 40px; font-size: 14px;">📊</span>
+                    <span style="color: #495057; font-size: 14px;">
+                        <strong style="color: #1e3c72;">${start + 1}-${end}</strong> of <strong style="color: #1e3c72;">${allStudents.length}</strong> records
+                    </span>
+                </div>
+                
+                <!-- Per Page Selector - Compact -->
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span style="color: #6c757d; font-size: 13px;">Show</span>
+                    <select onchange="changeItemsPerPage(this.value)" style="padding: 8px 12px; border: 1px solid #e0e0e0; border-radius: 40px; font-size: 14px; background: white; cursor: pointer; outline: none;">
+                        <option value="10" ${itemsPerPage === 10 ? 'selected' : ''}>10</option>
+                        <option value="25" ${itemsPerPage === 25 ? 'selected' : ''}>25</option>
+                        <option value="50" ${itemsPerPage === 50 ? 'selected' : ''}>50</option>
+                        <option value="100" ${itemsPerPage === 100 ? 'selected' : ''}>100</option>
+                    </select>
+                    <span style="color: #6c757d; font-size: 13px;">per page</span>
+                </div>
             </div>
-            <div style="display: flex; gap: 10px;">
-                <button class="btn btn-secondary" onclick="changePage(-1)" ${currentPage === 1 ? 'disabled' : ''} style="padding: 8px 16px; min-width: auto;">◀ Previous</button>
-                <span style="padding: 8px 16px;">Page ${currentPage} of ${totalPages}</span>
-                <button class="btn btn-secondary" onclick="changePage(1)" ${currentPage === totalPages ? 'disabled' : ''} style="padding: 8px 16px; min-width: auto;">Next ▶</button>
+            
+            <!-- Page Navigation - Mobile Optimized -->
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+                
+                <!-- Previous Button -->
+                <button onclick="changePage(-1)" ${currentPage === 1 ? 'disabled' : ''} style="display: flex; align-items: center; gap: 6px; padding: 10px 16px; background: ${currentPage === 1 ? '#f8f9fa' : 'white'}; border: 1px solid ${currentPage === 1 ? '#e9ecef' : '#1e3c72'}; border-radius: 40px; color: ${currentPage === 1 ? '#adb5bd' : '#1e3c72'}; font-weight: 500; font-size: 14px; cursor: ${currentPage === 1 ? 'not-allowed' : 'pointer'}; transition: all 0.2s;">
+                    <span style="font-size: 16px;">←</span>
+                    <span class="prev-text">Previous</span>
+                </button>
+                
+                <!-- Page Info - Compact on Mobile -->
+                <div style="display: flex; align-items: center; gap: 4px; background: #f8f9fa; padding: 6px 12px; border-radius: 40px;">
+                    <span style="color: #1e3c72; font-weight: 600; font-size: 15px;">${currentPage}</span>
+                    <span style="color: #6c757d; font-size: 13px;">/</span>
+                    <span style="color: #6c757d; font-size: 13px;">${totalPages}</span>
+                </div>
+                
+                <!-- Next Button -->
+                <button onclick="changePage(1)" ${currentPage === totalPages ? 'disabled' : ''} style="display: flex; align-items: center; gap: 6px; padding: 10px 16px; background: ${currentPage === totalPages ? '#f8f9fa' : 'white'}; border: 1px solid ${currentPage === totalPages ? '#e9ecef' : '#1e3c72'}; border-radius: 40px; color: ${currentPage === totalPages ? '#adb5bd' : '#1e3c72'}; font-weight: 500; font-size: 14px; cursor: ${currentPage === totalPages ? 'not-allowed' : 'pointer'}; transition: all 0.2s;">
+                    <span class="next-text">Next</span>
+                    <span style="font-size: 16px;">→</span>
+                </button>
             </div>
-            <div>
-                <select onchange="changeItemsPerPage(this.value)" style="padding: 8px; border-radius: var(--radius-sm); border: 2px solid var(--gray-light);">
-                    <option value="10">10 per page</option>
-                    <option value="25" selected>25 per page</option>
-                    <option value="50">50 per page</option>
-                    <option value="100">100 per page</option>
-                </select>
+            
+            <!-- Quick Jump (Optional - shows on tablet/desktop) -->
+            <div style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 4px;" class="quick-jump">
+                <span style="color: #6c757d; font-size: 13px;">Jump to page:</span>
+                <input type="number" min="1" max="${totalPages}" value="${currentPage}" onchange="jumpToPage(this.value)" style="width: 60px; padding: 6px 10px; border: 1px solid #e0e0e0; border-radius: 40px; text-align: center; font-size: 14px;">
+                <button onclick="jumpToPage(document.querySelector('#quickJumpInput').value)" style="background: #1e3c72; color: white; border: none; padding: 6px 16px; border-radius: 40px; font-size: 13px; cursor: pointer;">Go</button>
             </div>
         </div>
-    `;
+    </div>
+`;
 
     container.innerHTML = html;
 }
@@ -2386,6 +2474,15 @@ function changeItemsPerPage(value) {
     itemsPerPage = parseInt(value);
     currentPage = 1;
     renderCurrentPage();
+}
+
+// Jump to specific page
+function jumpToPage(page) {
+    page = parseInt(page);
+    if (page >= 1 && page <= Math.ceil(allStudents.length / itemsPerPage)) {
+        currentPage = page;
+        renderCurrentPage();
+    }
 }
 
         // =============================================
