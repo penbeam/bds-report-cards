@@ -693,7 +693,7 @@
             border-bottom: none;
         }
 
-        .load-btn {
+        .load-btn, .edit-btn {
             background: linear-gradient(135deg, var(--primary), var(--primary-light));
             color: var(--white);
             border: none;
@@ -703,14 +703,19 @@
             font-size: 12px;
             font-weight: 600;
             transition: var(--transition);
+            margin: 2px;
         }
 
-        .load-btn:hover {
+        .edit-btn {
+            background: linear-gradient(135deg, #ffc107, #fd7e14);
+        }
+
+        .load-btn:hover, .edit-btn:hover {
             transform: translateY(-1px);
             box-shadow: var(--shadow-sm);
         }
 
-        .load-btn:active {
+        .load-btn:active, .edit-btn:active {
             transform: translateY(0);
         }
 
@@ -876,7 +881,7 @@
                 padding: 8px 6px;
             }
             
-            .load-btn {
+            .load-btn, .edit-btn {
                 padding: 6px 12px;
                 font-size: 11px;
             }
@@ -892,11 +897,11 @@
 
         /* Touch device optimizations */
         @media (hover: none) and (pointer: coarse) {
-            .btn, .tab, .load-btn, .filter-group select {
+            .btn, .tab, .load-btn, .edit-btn, .filter-group select {
                 -webkit-tap-highlight-color: transparent;
             }
             
-            .btn:active, .tab:active, .load-btn:active {
+            .btn:active, .tab:active, .load-btn:active, .edit-btn:active {
                 opacity: 0.8;
             }
         }
@@ -973,6 +978,101 @@
         .modal-btn.save:hover {
             background: #c82333;
         }
+        
+        /* Edit mode indicator */
+        .edit-mode-indicator {
+            background: linear-gradient(135deg, #ffc107, #fd7e14);
+            color: var(--dark);
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        
+        .edit-mode-indicator i {
+            font-size: 16px;
+        }
+        
+        .cancel-edit-btn {
+            background: transparent;
+            border: 1px solid var(--dark);
+            color: var(--dark);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+        
+        .cancel-edit-btn:hover {
+            background: rgba(0,0,0,0.1);
+        }
+
+/* Export Modal (uses same modal style as duplicate modal) */
+#exportModal .modal-content {
+    max-width: 400px;
+}
+
+#exportModal label {
+    display: block;
+    margin: 10px 0;
+    padding: 10px;
+    border: 1px solid var(--gray-light);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+#exportModal label:hover {
+    background: var(--light);
+}
+
+#exportModal input[type="radio"] {
+    margin-right: 10px;
+}
+
+/* WhatsApp button style */
+.btn-whatsapp {
+    background: #25D366;
+    color: white;
+}
+
+.btn-whatsapp:hover {
+    background: #128C7E;
+}
+
+/* Contact bar button hover effects */
+/* Contact bar button hover effects */
+    .contact-btn {
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    
+    .contact-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        filter: brightness(1.05);
+    }
+    
+    .contact-btn:active {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    
+    /* Mobile-specific adjustments */
+    @media (max-width: 480px) {
+        .contact-btn {
+            padding: 10px 12px !important;
+            font-size: 13px !important;
+            min-width: 100px !important;
+        }
+    }
+
+
     </style>
 </head>
 <body>
@@ -982,6 +1082,54 @@
             <h1>GGHS BENAZIR DISTRICT SCHOOL NAWABSHAH-1</h1>
             <p>Under the Management of SZABIST Zab-ed</p>
         </div>
+
+<!-- ============================================= -->
+<!-- PROFESSIONAL CONTACT BAR - STARTS HERE -->
+<!-- ============================================= -->
+<!-- Professional Contact Bar - Mobile First -->
+<div style="background: white; border-radius: 12px; padding: 16px; margin: 0 0 20px 0; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border: 1px solid #e9ecef; width: 100%; box-sizing: border-box;">
+    
+    <!-- Mobile: Stacked layout, Desktop: Row layout -->
+    <div style="display: flex; flex-direction: column; gap: 16px; width: 100%;">
+        
+        <!-- Top row: Support text (full width on mobile) -->
+        <div style="display: flex; align-items: center; gap: 12px; width: 100%;">
+            <div style="background: linear-gradient(135deg, #e7f5ff, #d0ebff); width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 40px; font-size: 20px; flex-shrink: 0;">
+                🎓
+            </div>
+            <div style="flex: 1;">
+                <div style="font-weight: 600; color: #212529; font-size: clamp(14px, 4vw, 16px);">Need assistance with the system?</div>
+                <div style="font-size: clamp(12px, 3.5vw, 13px); color: #6c757d; margin-top: 2px;">Our support team is ready to help</div>
+            </div>
+        </div>
+        
+        <!-- Bottom row: Buttons (wrap on mobile) -->
+        <div style="display: flex; flex-wrap: wrap; gap: 10px; width: 100%;">
+            
+            <!-- WhatsApp Button with hover effect -->
+            <a href="https://wa.me/923322991032" target="_blank" class="contact-btn" style="display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: #25D366; color: white; padding: 12px 20px; border-radius: 40px; text-decoration: none; font-weight: 500; font-size: 14px; transition: all 0.3s ease; flex: 1 1 auto; min-width: 120px; border: none; cursor: pointer;">
+                <span style="font-size: 18px;">📱</span>
+                <span>WhatsApp</span>
+            </a>
+            
+            <!-- Gmail Button with hover effect -->
+            <a href="https://mail.google.com/mail/?view=cm&fs=1&to=voiceatrights2013@gmail.com" target="_blank" class="contact-btn" style="display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: #EA4335; color: white; padding: 12px 20px; border-radius: 40px; text-decoration: none; font-weight: 500; font-size: 14px; transition: all 0.3s ease; flex: 1 1 auto; min-width: 120px; border: none; cursor: pointer;">
+                <span style="font-size: 18px;">📧</span>
+                <span>Gmail</span>
+            </a>
+            
+            <!-- Call Button with hover effect -->
+            <a href="tel:+923322991032" class="contact-btn" style="display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: #6c757d; color: white; padding: 12px 20px; border-radius: 40px; text-decoration: none; font-weight: 500; font-size: 14px; transition: all 0.3s ease; flex: 1 1 auto; min-width: 120px; border: none; cursor: pointer;">
+                <span style="font-size: 18px;">📞</span>
+                <span>Call</span>
+            </a>
+        </div>
+    </div>
+</div>
+<!-- ============================================= -->
+<!-- PROFESSIONAL CONTACT BAR - ENDS HERE -->
+<!-- ============================================= -->
+
 
         <!-- Apps Script URL Configuration -->
         <div class="url-section">
@@ -994,17 +1142,89 @@
             </div>
         </div>
 
+        <!-- Edit Mode Indicator (Hidden by default) -->
+        <div id="editModeIndicator" class="edit-mode-indicator" style="display: none;">
+            <span>✏️ Editing Mode</span>
+            <span>Editing student with Roll No: <span id="editingRollNo"></span></span>
+            <button class="cancel-edit-btn" onclick="cancelEdit()">Cancel Edit</button>
+        </div>
+
         <!-- Duplicate Warning Modal -->
         <div id="duplicateModal" class="modal">
             <div class="modal-content">
                 <h3>⚠️ Duplicate Roll Number Found!</h3>
                 <p>A student with roll number <strong id="dupRollNo"></strong> already exists.</p>
-                <p>Please use a different roll number or search for the existing student to update.</p>
+                <p>Would you like to edit the existing record instead?</p>
                 <div class="modal-actions">
-                    <button class="modal-btn cancel" onclick="closeDuplicateModal()">OK, I Understand</button>
+                    <button class="modal-btn cancel" onclick="closeDuplicateModal()">No, Cancel</button>
+                    <button class="modal-btn save" onclick="editDuplicateRecord()">Yes, Edit</button>
                 </div>
             </div>
         </div>
+
+<!-- Export Options Modal -->
+<div id="exportModal" class="modal">
+    <div class="modal-content" style="max-width: 400px;">
+        <h3>📥 Export Options</h3>
+        <p>Choose what you want to export:</p>
+        
+        <div style="margin: 20px 0;">
+            <label style="display: block; margin: 10px 0;">
+                <input type="radio" name="exportType" value="current" checked> 
+                <strong>Current View</strong> - Export only what's shown in the table
+            </label>
+            <label style="display: block; margin: 10px 0;">
+                <input type="radio" name="exportType" value="filtered"> 
+                <strong>Filtered Results</strong> - Export all students matching current filters
+            </label>
+            <label style="display: block; margin: 10px 0;">
+                <input type="radio" name="exportType" value="all"> 
+                <strong>All Data</strong> - Export EVERYTHING (all columns)
+            </label>
+            <label style="display: block; margin: 10px 0;">
+                <input type="radio" name="exportType" value="summary"> 
+                <strong>Summary Report</strong> - Export statistics only
+            </label>
+        </div>
+        
+        <div class="modal-actions">
+            <button class="modal-btn cancel" onclick="closeExportModal()">Cancel</button>
+            <button class="modal-btn save" onclick="handleExport()" style="background: #28a745;">Export</button>
+        </div>
+    </div>
+</div>
+
+
+<!-- Export Disabled Modal -->
+<div id="exportDisabledModal" class="modal">
+    <div class="modal-content" style="max-width: 450px; text-align: center;">
+        <div style="font-size: 48px; margin-bottom: 20px;">🔒</div>
+        <h3 style="color: var(--primary); margin-bottom: 20px;">Export Feature Disabled</h3>
+        
+        <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+            <p style="margin-bottom: 15px; font-size: 16px;">
+                To enable this export feature, please contact:
+            </p>
+            <p style="font-size: 20px; font-weight: bold; color: var(--primary); margin-bottom: 10px;">
+                Muhammad Nadeem
+            </p>
+            <p style="font-size: 24px; font-weight: bold; color: #25D366; margin-bottom: 5px;">
+                +92 332 2991032
+            </p>
+            <p style="font-size: 14px; color: #666;">
+                Available via WhatsApp
+            </p>
+        </div>
+        
+        <div style="display: flex; gap: 10px; justify-content: center;">
+            <a href="https://wa.me/923322991032" target="_blank" class="btn btn-success" style="text-decoration: none; min-width: 150px; background: #25D366;">
+                📱 WhatsApp
+            </a>
+            <button class="modal-btn cancel" onclick="closeExportDisabledModal()" style="min-width: 100px;">Close</button>
+        </div>
+    </div>
+</div>
+
 
         <!-- Tabs -->
         <div class="tabs">
@@ -1031,7 +1251,7 @@
             <div class="card">
                 <h2>📝 Student Information</h2>
                 
-                <!-- New Academic Session, Report Term, Working Days Term fields -->
+                <!-- Academic Session, Report Term, Working Days Term fields -->
                 <div class="academic-row">
                     <div class="academic-field">
                         <label>Academic Session</label>
@@ -1065,7 +1285,10 @@
                     </div>
                     <div class="form-group">
                         <label>Roll Number <span class="required">*</span></label>
-                        <input type="text" id="rollNumber" placeholder="Enter roll number" value="43" onblur="checkDuplicateRollNo()">
+       <input type="text" id="rollNumber" placeholder="Enter roll number" value="" 
+       oninput="debounceCheck()" 
+       onchange="checkDuplicateRollNo()"
+       onkeyup="console.log('Key pressed:', this.value)"> <!-- Debug line -->
                     </div>
                     <div class="form-group">
                         <label>Days Attended</label>
@@ -1132,9 +1355,9 @@
 
             <!-- Action Buttons -->
             <div class="action-buttons">
-                <button class="btn btn-primary" onclick="saveToSheet()">💾 Save to Sheet</button>
-                <button class="btn btn-success" onclick="printReportCard()">🖨️ Print PDF</button>
-                <button class="btn btn-warning" onclick="clearForm()">🔄 Clear</button>
+                <button type="button" id="btnSave" class="btn btn-primary" onclick="saveOrUpdate()">💾 Save to Sheet</button>
+                <button type="button" id="btnPrint" class="btn btn-success" onclick="printReportCard()">🖨️ Print PDF</button>
+                <button type="button" id="btnClear" class="btn btn-warning" onclick="clearForm()">🔄 Clear</button>
             </div>
         </div>
 
@@ -1145,8 +1368,90 @@
                     <h2>🔍 Search Student Records</h2>
                     <div class="search-actions">
                         <button class="btn btn-secondary" onclick="clearSearchResults()" style="min-width: auto; padding: 10px 20px;">🗑️ Clear</button>
+<button class="btn btn-success" onclick="showExportOptions()" style="min-width: auto; padding: 10px 20px;">📥 Export</button>
                     </div>
                 </div>
+
+        <!-- ============================================= -->
+        <!-- ✅ INSERT DASHBOARD HTML RIGHT HERE -->
+        <!-- ============================================= -->
+
+<!-- Professional Dashboard Metrics -->
+<div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 24px;">
+    
+    <!-- Total Students Card -->
+    <div style="background: linear-gradient(135deg, #4361ee, #3a0ca3); padding: 16px; border-radius: 16px; color: white; box-shadow: 0 10px 20px rgba(67, 97, 238, 0.2);">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+            <span style="font-size: 14px; opacity: 0.9;">Total Students</span>
+            <span style="font-size: 20px;">👥</span>
+        </div>
+        <div style="font-size: 32px; font-weight: bold; line-height: 1.2;" id="totalStudentsCount">0</div>
+        <div style="font-size: 12px; opacity: 0.7; margin-top: 4px;">Enrolled this year</div>
+    </div>
+    
+    <!-- Active Classes Card -->
+    <div style="background: linear-gradient(135deg, #06d6a0, #118ab2); padding: 16px; border-radius: 16px; color: white; box-shadow: 0 10px 20px rgba(6, 214, 160, 0.2);">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+            <span style="font-size: 14px; opacity: 0.9;">Active Classes</span>
+            <span style="font-size: 20px;">📚</span>
+        </div>
+        <div style="font-size: 32px; font-weight-bold;" id="totalClassesCount">0</div>
+        <div style="font-size: 12px; opacity: 0.7; margin-top: 4px;">Sections running</div>
+    </div>
+    
+    <!-- Pass Rate Card -->
+    <div style="background: linear-gradient(135deg, #ff9e00, #f37335); padding: 16px; border-radius: 16px; color: white; box-shadow: 0 10px 20px rgba(255, 158, 0, 0.2);">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+            <span style="font-size: 14px; opacity: 0.9;">Pass Rate</span>
+            <span style="font-size: 20px;">📊</span>
+        </div>
+        <div style="font-size: 32px; font-weight: bold;" id="passRate">0%</div>
+        <div style="font-size: 12px; opacity: 0.7; margin-top: 4px;">Above 40% marks</div>
+    </div>
+    
+    <!-- Top Performer Card -->
+    <div style="background: linear-gradient(135deg, #9c89b8, #7b6c9c); padding: 16px; border-radius: 16px; color: white; box-shadow: 0 10px 20px rgba(156, 137, 184, 0.2);">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+            <span style="font-size: 14px; opacity: 0.9;">Top Grade</span>
+            <span style="font-size: 20px;">🏆</span>
+        </div>
+        <div style="font-size: 32px; font-weight: bold;" id="topGrade">-</div>
+        <div style="font-size: 12px; opacity: 0.7; margin-top: 4px;">Highest achieved</div>
+    </div>
+</div>
+
+<!-- Secondary Metrics Row -->
+<div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 24px;">
+    
+    <!-- Average Score Card -->
+    <div style="background: white; border: 1px solid #e9ecef; padding: 16px; border-radius: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+            <span style="background: #e7f5ff; padding: 6px; border-radius: 10px; font-size: 16px;">📈</span>
+            <span style="color: #495057; font-weight: 600; font-size: 14px;">Average Score</span>
+        </div>
+        <div style="font-size: 28px; font-weight: bold; color: #212529;" id="avgScore">0%</div>
+        <div style="height: 4px; background: #e9ecef; border-radius: 2px; margin-top: 8px;">
+            <div id="avgScoreBar" style="width: 0%; height: 4px; background: linear-gradient(90deg, #4facfe, #00f2fe); border-radius: 2px;"></div>
+        </div>
+    </div>
+    
+    <!-- Gender Ratio Card (Optional - if you have gender data) -->
+    <div style="background: white; border: 1px solid #e9ecef; padding: 16px; border-radius: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+            <span style="background: #f3e8ff; padding: 6px; border-radius: 10px; font-size: 16px;">⚥</span>
+            <span style="color: #495057; font-weight: 600; font-size: 14px;">Completion Rate</span>
+        </div>
+        <div style="font-size: 28px; font-weight: bold; color: #212529;" id="completionRate">0%</div>
+        <div style="display: flex; justify-content: space-between; margin-top: 8px; font-size: 12px; color: #6c757d;">
+            <span>With Marks</span>
+            <span id="completionDetail">0/0</span>
+        </div>
+    </div>
+</div>
+
+        <!-- ============================================= -->
+        <!-- ✅ DASHBOARD HTML ENDED HERE -->
+        <!-- ============================================= -->
                 
                 <!-- Class Filter Row -->
                 <div class="filter-row">
@@ -1195,17 +1500,17 @@
 
     <script>
         // =============================================
-        // DEFAULT SUBJECTS - Exactly like your screenshot
+        // DEFAULT SUBJECTS - Updated with new subject names
         // =============================================
         const defaultSubjects = [
-            { name: 'English', totalMarks: 100, obtained: '14', remarks: 'Needs Improvement' },
-            { name: 'Urdu', totalMarks: 100, obtained: '06', remarks: 'Needs Improvement' },
-            { name: 'Maths', totalMarks: 100, obtained: 'A', remarks: 'Be punctual' },
-            { name: 'Science', totalMarks: 100, obtained: '07', remarks: 'Needs Improvement' },
-            { name: 'S.S.Tudies', totalMarks: 50, obtained: '03', remarks: 'Needs Improvement' },
-            { name: 'Islamiyat', totalMarks: 50, obtained: '12', remarks: 'Needs Improvement' },
-            { name: 'Sindhi', totalMarks: 50, obtained: '17', remarks: 'Needs Improvement' },
-            { name: 'Computer', totalMarks: 50, obtained: '15', remarks: 'Needs Improvement' }
+            { name: 'English', totalMarks: 100, obtained: '14', remarks: 'Needs Improvement', signature: '' },
+            { name: 'Urdu', totalMarks: 100, obtained: '06', remarks: 'Needs Improvement', signature: '' },
+            { name: 'Maths', totalMarks: 100, obtained: 'A', remarks: 'Be punctual', signature: '' },
+            { name: 'Science', totalMarks: 100, obtained: '07', remarks: 'Needs Improvement', signature: '' },
+            { name: 'S. Studies', totalMarks: 50, obtained: '03', remarks: 'Needs Improvement', signature: '' },
+            { name: 'Islamiyat', totalMarks: 50, obtained: '12', remarks: 'Needs Improvement', signature: '' },
+            { name: 'Sindhi', totalMarks: 50, obtained: '17', remarks: 'Needs Improvement', signature: '' },
+            { name: 'Computer', totalMarks: 50, obtained: '15', remarks: 'Needs Improvement', signature: '' }
         ];
 
         // =============================================
@@ -1222,6 +1527,34 @@
         };
 
         // =============================================
+        // EDIT MODE VARIABLES
+        // =============================================
+        let isEditMode = false;
+        let editingStudentTimestamp = null;
+        let editingStudentData = null;
+        let latestRequestID = 0;
+        let debounceTimer;
+        let activeCheck = null;
+        // EXPORT FEATURE TOGGLE - Change this to false to disable export
+        const EXPORT_ENABLED = false;  // Set to false to block export, true to enable
+        let currentPage = 1;
+        let itemsPerPage = 25;
+        let allStudents = [];
+
+
+        // =============================================
+// DEBOUNCE FUNCTION - FIXED VERSION
+// =============================================
+function debounceCheck() {
+    console.log("🔵 debounceCheck triggered"); // Debug log
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => {
+        console.log("🟢 Calling checkDuplicateRollNo after debounce");
+        checkDuplicateRollNo();
+    }, 500);
+}
+
+        // =============================================
         // INITIALIZATION
         // =============================================
         window.onload = function() {
@@ -1229,6 +1562,7 @@
             checkConnection();
             showPreview();
             initializeStorage();
+            updateDashboardMetrics();
             console.log('System initialized');
         };
 
@@ -1242,11 +1576,11 @@
             const tbody = document.getElementById('subjectsBody');
             tbody.innerHTML = '';
             defaultSubjects.forEach(subject => {
-                addSubjectRow(subject.name, subject.totalMarks, subject.obtained, subject.remarks);
+                addSubjectRow(subject.name, subject.totalMarks, subject.obtained, subject.remarks, subject.signature);
             });
         }
 
-        function addSubjectRow(name = '', totalMarks = 100, obtained = '', remarks = '') {
+        function addSubjectRow(name = '', totalMarks = 100, obtained = '', remarks = '', signature = '') {
             const tbody = document.getElementById('subjectsBody');
             const row = tbody.insertRow();
             
@@ -1260,8 +1594,8 @@
                 const obtainedNum = parseFloat(obtained);
                 const totalNum = parseFloat(totalMarks);
                 if (totalNum > 0) {
-                    const percent = ((obtainedNum / totalNum) * 100).toFixed(0);
-                    percentage = percent + '%';
+                    const percent = ((obtainedNum / totalNum) * 100).toFixed(2);
+                    percentage = percent; // Store as number without % symbol
                     
                     if (percent >= 90) grade = 'A+';
                     else if (percent >= 80) grade = 'A';
@@ -1279,8 +1613,8 @@
                 <td><input type="text" value="${obtained}" onchange="updateRow(this)"></td>
                 <td class="percentage-display">${percentage}</td>
                 <td class="grade-display">${grade}</td>
-                <td><input type="text" value="${remarks}" placeholder="Remarks"></td>
-                <td><input type="text" value="" placeholder="Signature"></td>
+                <td><input type="text" value="${remarks}" placeholder="Remarks" onchange="updateRow(this)"></td>
+                <td><input type="text" value="${signature}" placeholder="Signature" onchange="updateRow(this)"></td>
                 <td><button onclick="this.closest('tr').remove()" style="background:#dc3545; color:white; border:none; padding:5px 10px; border-radius:3px; cursor:pointer;">✖</button></td>
             `;
         }
@@ -1301,8 +1635,8 @@
             const total = parseFloat(totalMarks) || 0;
             
             if (total > 0) {
-                const percentage = ((obtained / total) * 100).toFixed(0);
-                row.cells[3].innerHTML = percentage + '%';
+                const percentage = ((obtained / total) * 100).toFixed(2);
+                row.cells[3].innerHTML = percentage; // Store as number without % symbol
                 
                 let grade = 'F';
                 if (percentage >= 90) grade = 'A+';
@@ -1335,16 +1669,39 @@
         // =============================================
         // DUPLICATE CHECK FUNCTIONS
         // =============================================
-        let pendingSaveData = null;
+        let pendingDuplicateData = null;
 
-        function showDuplicateModal(rollNo) {
+        function showDuplicateModal(rollNo, studentData) {
             document.getElementById('dupRollNo').textContent = rollNo;
+            pendingDuplicateData = studentData;
             document.getElementById('duplicateModal').classList.add('active');
         }
 
-        function closeDuplicateModal() {
-            document.getElementById('duplicateModal').classList.remove('active');
-            pendingSaveData = null;
+        // =============================================
+// CLOSE MODAL FUNCTION - Simplified
+// =============================================
+function closeDuplicateModal() {
+    document.getElementById('duplicateModal').classList.remove('active');
+    pendingDuplicateData = null;
+    document.getElementById('rollNumber').focus();
+    // Don't call checkDuplicateRollNo here anymore - let oninput/onchange handle it
+}
+
+        function editDuplicateRecord() {
+            closeDuplicateModal();
+            if (pendingDuplicateData) {
+                loadStudentData(pendingDuplicateData);
+                // Enable edit mode
+                isEditMode = true;
+                editingStudentTimestamp = pendingDuplicateData.timestamp;
+                document.getElementById('editModeIndicator').style.display = 'flex';
+                document.getElementById('editingRollNo').textContent = pendingDuplicateData.rollNumber;
+                
+                // Change save button to update
+                const btnSave = document.getElementById('btnSave');
+                btnSave.innerHTML = '✏️ Update Record';
+                btnSave.style.background = 'linear-gradient(135deg, #ffc107, #fd7e14)';
+            }
         }
 
         function checkDuplicateRollNumber(rollNumber) {
@@ -1388,12 +1745,23 @@
         }
 
         // =============================================
-        // SAVE FUNCTIONS (UPDATED with working duplicate check)
+        // SAVE OR UPDATE FUNCTIONS - UPDATED for new column structure
         // =============================================
         function saveToLocalStorage(data) {
             try {
                 const savedData = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-                savedData.push(data);
+                
+                if (isEditMode && editingStudentTimestamp) {
+                    // Update existing record
+                    const index = savedData.findIndex(s => s.timestamp === editingStudentTimestamp);
+                    if (index !== -1) {
+                        savedData[index] = data;
+                    }
+                } else {
+                    // Add new record
+                    savedData.push(data);
+                }
+                
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(savedData));
                 return true;
             } catch (e) {
@@ -1402,96 +1770,153 @@
             }
         }
 
-        async function saveToSheet() {
-            const url = document.getElementById('appsScriptUrl').value;
+        async function saveOrUpdate() {
+    // Add this check at the very beginning
+    const rollInput = document.getElementById('rollNumber');
+    if (rollInput.style.borderColor === "rgb(220, 53, 69)") { // Red border color
+        showMessage('Cannot save: Duplicate roll number detected', 'error');
+        return;
+    }
+    const url = document.getElementById('appsScriptUrl').value;
+    
+    if (!url || url === 'YOUR_APPS_SCRIPT_URL_HERE') {
+        showMessage('Please enter your Google Apps Script URL first', 'error');
+        return;
+    }
+
+    const required = ['studentName', 'fatherName', 'studentClass', 'rollNumber'];
+    for (let field of required) {
+        if (!document.getElementById(field).value) {
+            showMessage('Please fill ' + field.replace(/([A-Z])/g, ' $1').toLowerCase(), 'error');
+            return;
+        }
+    }
+
+    const rollNumber = document.getElementById('rollNumber').value;
+    
+    // --- THE GATEKEEPER - ALWAYS CHECK DUPLICATES ---
+    setLoading(true);
+    showMessage('Checking for duplicates...', 'info');
+    
+    const duplicateCheck = await checkDuplicateRollNumber(rollNumber);
+    
+    // If duplicate exists
+    if (duplicateCheck.isDuplicate && duplicateCheck.student) {
+        
+        // Check if we're in edit mode AND this is the SAME student
+        const isEditingSameStudent = isEditMode && 
+                                     editingStudentTimestamp && 
+                                     duplicateCheck.student.timestamp === editingStudentTimestamp;
+        
+        if (!isEditingSameStudent) {
+            // This is a DIFFERENT student with same roll number - BLOCK IT!
+            setLoading(false);
+            showDuplicateModal(rollNumber, duplicateCheck.student);
+            return; // ← CRITICAL: This STOPS the save completely
+        }
+        // If it's the same student, we allow the update to proceed
+    }
+
+    // If we get here, either:
+    // 1. No duplicate found, OR
+    // 2. Duplicate found but it's the same student being edited
+    
+    setLoading(true);
+    showMessage(isEditMode ? 'Updating record...' : 'Saving to Google Sheet...', 'info');
+
+    // Collect all data
+    const data = {
+        academicSession: document.getElementById('academicSession').value,
+        reportTerm: document.getElementById('reportTerm').value,
+        workingDaysTerm: document.getElementById('workingDaysTerm').value,
+        term: document.getElementById('reportTerm').value,
+        studentName: document.getElementById('studentName').value,
+        fatherName: document.getElementById('fatherName').value,
+        studentClass: document.getElementById('studentClass').value,
+        rollNumber: rollNumber,
+        daysAttended: document.getElementById('daysAttended').value,
+        totalWorkingDays: document.getElementById('totalWorkingDays').value,
+        teacherComments: document.getElementById('teacherComments').value,
+        classTeacherSign: document.getElementById('classTeacherSign').value,
+        coordinatorSign: document.getElementById('coordinatorSign').value,
+        headMistressSign: document.getElementById('headMistressSign').value,
+        parentSign: document.getElementById('parentSign').value,
+        timestamp: isEditMode && editingStudentTimestamp ? editingStudentTimestamp : new Date().toISOString(),
+        subjects: []
+    };
+
+    const rows = document.getElementById('subjectsBody').rows;
+    for (let i = 0; i < rows.length; i++) {
+        const inputs = rows[i].getElementsByTagName('input');
+        data.subjects.push({
+            name: inputs[0].value,
+            totalMarks: inputs[1].value,
+            marksObtained: inputs[2].value,
+            percentage: rows[i].cells[3].innerHTML,
+            grade: rows[i].cells[4].innerHTML,
+            remarks: inputs[3].value,
+            signature: inputs[4].value
+        });
+    }
+
+    // Save to localStorage
+    saveToLocalStorage(data);
+
+    // Send to Google Sheets
+    const postData = {
+        ...data,
+        action: isEditMode ? 'update' : 'create'
+    };
+
+    fetch(url, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(postData)
+    })
+    .then(() => {
+        setLoading(false);
+        showMessage(isEditMode ? '✅ Record updated successfully!' : '✅ Data saved to Google Sheet successfully!', 'success');
+
+        // ✅ Dashboard Update Call
+        updateDashboardMetrics();
+        
+        if (isEditMode) {
+            cancelEdit();
+        }
+    })
+    .catch(error => {
+        setLoading(false);
+        showMessage(isEditMode ? '⚠️ Record updated locally. Sheet error: ' + error.message : '❌ Error saving to sheet: ' + error.message, 'info');
+        
+        if (isEditMode) {
+            cancelEdit();
+        }
+    });
+}
+
+        // =============================================
+        // CANCEL EDIT MODE
+        // =============================================
+        function cancelEdit() {
+            isEditMode = false;
+            editingStudentTimestamp = null;
+            editingStudentData = null;
+            document.getElementById('editModeIndicator').style.display = 'none';
             
-            if (!url || url === 'YOUR_APPS_SCRIPT_URL_HERE') {
-                showMessage('Please enter your Google Apps Script URL first', 'error');
-                return;
-            }
-
-            const required = ['studentName', 'fatherName', 'studentClass', 'rollNumber'];
-            for (let field of required) {
-                if (!document.getElementById(field).value) {
-                    showMessage('Please fill ' + field.replace(/([A-Z])/g, ' $1').toLowerCase(), 'error');
-                    return;
-                }
-            }
-
-            const rollNumber = document.getElementById('rollNumber').value;
+            // Restore save button
+            const btnSave = document.getElementById('btnSave');
+            btnSave.innerHTML = '💾 Save to Sheet';
+            btnSave.style.background = 'linear-gradient(135deg, var(--primary), var(--primary-light))';
             
-            // Check for duplicates
-            setLoading(true);
-            showMessage('Checking for duplicates...', 'info');
-            
-            const duplicateCheck = await checkDuplicateRollNumber(rollNumber);
-            
-            if (duplicateCheck.isDuplicate) {
-                setLoading(false);
-                showDuplicateModal(rollNumber);
-                return;
-            }
-
-            // Updated data object with new fields
-            const data = {
-                academicSession: document.getElementById('academicSession').value,
-                reportTerm: document.getElementById('reportTerm').value,
-                workingDaysTerm: document.getElementById('workingDaysTerm').value,
-                // Keep old term field for backward compatibility
-                term: document.getElementById('reportTerm').value,
-                studentName: document.getElementById('studentName').value,
-                fatherName: document.getElementById('fatherName').value,
-                studentClass: document.getElementById('studentClass').value,
-                rollNumber: rollNumber,
-                daysAttended: document.getElementById('daysAttended').value,
-                totalWorkingDays: document.getElementById('totalWorkingDays').value,
-                teacherComments: document.getElementById('teacherComments').value,
-                classTeacherSign: document.getElementById('classTeacherSign').value,
-                coordinatorSign: document.getElementById('coordinatorSign').value,
-                headMistressSign: document.getElementById('headMistressSign').value,
-                parentSign: document.getElementById('parentSign').value,
-                timestamp: new Date().toISOString(),
-                subjects: []
-            };
-
-            const rows = document.getElementById('subjectsBody').rows;
-            for (let i = 0; i < rows.length; i++) {
-                const inputs = rows[i].getElementsByTagName('input');
-                data.subjects.push({
-                    name: inputs[0].value,
-                    totalMarks: inputs[1].value,
-                    marksObtained: inputs[2].value,
-                    percentage: rows[i].cells[3].innerHTML,
-                    grade: rows[i].cells[4].innerHTML,
-                    remarks: inputs[3].value,
-                    signature: inputs[4].value
-                });
-            }
-
-            showMessage('Saving to Google Sheet...', 'info');
-
-            saveToLocalStorage(data);
-
-            fetch(url, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(data)
-            })
-            .then(() => {
-                setLoading(false);
-                showMessage('✅ Data saved to Google Sheet successfully!', 'success');
-            })
-            .catch(error => {
-                setLoading(false);
-                showMessage('❌ Error saving to sheet: ' + error.message, 'error');
-            });
+            // Clear form
+            clearForm();
         }
 
         // =============================================
-        // FETCH ALL STUDENTS (IMPROVED - Better error handling)
+        // FETCH ALL STUDENTS
         // =============================================
         function fetchAllStudents() {
             const url = document.getElementById('appsScriptUrl').value;
@@ -1559,10 +1984,17 @@
                         
                         // Display records
                         displayStudentRecords(data.students);
+                   
+                        // Metrics Update Call
+                        updateDashboardMetrics();
                         
                         showMessage(`✅ Loaded ${data.students.length} student records`, 'success');
                     } else {
                         document.getElementById('searchResults').innerHTML = '<div class="message info">No student records found</div>';
+
+                        // Metrics Update Call
+                        updateDashboardMetrics();
+
                         showMessage('No records found', 'info');
                     }
                     setLoading(false);
@@ -1648,6 +2080,113 @@
                 sectionSelect.appendChild(option);
             });
         }
+
+// =============================================
+// PROFESSIONAL DASHBOARD METRICS
+// =============================================
+function updateDashboardMetrics() {
+    const students = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+    
+    if (students.length === 0) {
+        // Show empty state
+        document.getElementById('totalStudentsCount').textContent = '0';
+        document.getElementById('totalClassesCount').textContent = '0';
+        document.getElementById('passRate').textContent = '0%';
+        document.getElementById('topGrade').textContent = '-';
+        document.getElementById('avgScore').textContent = '0%';
+        document.getElementById('avgScoreBar').style.width = '0%';
+        document.getElementById('completionRate').textContent = '0%';
+        document.getElementById('completionDetail').textContent = '0/0';
+        return;
+    }
+    
+    // ===== CARD 1: Total Students =====
+    document.getElementById('totalStudentsCount').textContent = students.length;
+    
+    // ===== CARD 2: Active Classes =====
+    const uniqueClasses = new Set();
+    students.forEach(s => {
+        if (s.studentClass) uniqueClasses.add(s.studentClass);
+    });
+    document.getElementById('totalClassesCount').textContent = uniqueClasses.size;
+    
+    // ===== CARD 3 & 4: Pass Rate & Top Grade =====
+    let passed = 0;
+    let totalWithMarks = 0;
+    let totalPercentageSum = 0;
+    let gradeCounts = { 'A+': 0, 'A': 0, 'B': 0, 'C': 0, 'D': 0, 'E': 0, 'F': 0 };
+    
+    students.forEach(s => {
+        let totalMarks = 0;
+        let obtainedMarks = 0;
+        let hasMarks = false;
+        
+        if (s.subjects) {
+            s.subjects.forEach(subject => {
+                if (subject.marksObtained && subject.marksObtained.toString().trim() !== '') {
+                    hasMarks = true;
+                    const total = parseFloat(subject.totalMarks) || 0;
+                    const obtained = parseFloat(subject.marksObtained) || 0;
+                    totalMarks += total;
+                    obtainedMarks += obtained;
+                }
+            });
+        }
+        
+        if (hasMarks && totalMarks > 0) {
+            totalWithMarks++;
+            const percentage = (obtainedMarks / totalMarks) * 100;
+            totalPercentageSum += percentage;
+            
+            let grade = 'F';
+            if (percentage >= 90) grade = 'A+';
+            else if (percentage >= 80) grade = 'A';
+            else if (percentage >= 70) grade = 'B';
+            else if (percentage >= 60) grade = 'C';
+            else if (percentage >= 50) grade = 'D';
+            else if (percentage >= 40) grade = 'E';
+            
+            gradeCounts[grade]++;
+            
+            if (grade !== 'F') passed++;
+        }
+    });
+    
+    // Pass Rate
+    const passRate = totalWithMarks > 0 ? Math.round((passed / totalWithMarks) * 100) : 0;
+    document.getElementById('passRate').textContent = passRate + '%';
+    
+    // Top Grade
+    const gradeOrder = ['A+', 'A', 'B', 'C', 'D', 'E', 'F'];
+    let topGradeFound = false;
+    for (let grade of gradeOrder) {
+        if (gradeCounts[grade] > 0) {
+            document.getElementById('topGrade').textContent = grade;
+            topGradeFound = true;
+            break;
+        }
+    }
+    if (!topGradeFound) document.getElementById('topGrade').textContent = '-';
+    
+    // ===== CARD 5: Average Score =====
+    const avgScore = totalWithMarks > 0 ? Math.round(totalPercentageSum / totalWithMarks) : 0;
+    document.getElementById('avgScore').textContent = avgScore + '%';
+    document.getElementById('avgScoreBar').style.width = avgScore + '%';
+    
+    // ===== CARD 6: Completion Rate =====
+    const completionRate = students.length > 0 ? Math.round((totalWithMarks / students.length) * 100) : 0;
+    document.getElementById('completionRate').textContent = completionRate + '%';
+    document.getElementById('completionDetail').textContent = `${totalWithMarks}/${students.length}`;
+    
+    // Log for debugging (optional)
+    console.log('📊 Dashboard Updated:', {
+        total: students.length,
+        withMarks: totalWithMarks,
+        passRate: passRate + '%',
+        avgScore: avgScore + '%'
+    });
+}
+
 
         // =============================================
         // Apply Filters
@@ -1748,56 +2287,106 @@
         }
 
         // =============================================
-        // DISPLAY STUDENT RECORDS (UPDATED with new fields)
-        // =============================================
-        function displayStudentRecords(students) {
-            const container = document.getElementById('searchResults');
-            
-            if (!students || students.length === 0) {
-                container.innerHTML = '<div class="message info">No records to display</div>';
-                return;
-            }
-            
-            let html = `
-                <div class="table-container">
-                    <table class="results-table">
-                        <thead>
-                            <tr>
-                                <th>Roll No</th>
-                                <th>Name</th>
-                                <th>Father</th>
-                                <th>Class</th>
-                                <th>Report Term</th>
-                                <th>Academic Session</th>
-                                <th>Date</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-            `;
+// DISPLAY STUDENT RECORDS - WITH PAGINATION
+// =============================================
+function displayStudentRecords(students) {
+    // Store all students
+    allStudents = students;
+    currentPage = 1;
+    renderCurrentPage();
+}
 
-            students.forEach((student) => {
-                const date = student.timestamp ? new Date(student.timestamp).toLocaleDateString() : 'N/A';
-                
-                html += `
+function renderCurrentPage() {
+    const container = document.getElementById('searchResults');
+    
+    if (!allStudents || allStudents.length === 0) {
+        container.innerHTML = '<div class="message info">No records to display</div>';
+        return;
+    }
+
+    // Calculate pagination
+    const totalPages = Math.ceil(allStudents.length / itemsPerPage);
+    const start = (currentPage - 1) * itemsPerPage;
+    const end = Math.min(start + itemsPerPage, allStudents.length);
+    const pageStudents = allStudents.slice(start, end);
+
+    // Build table HTML
+    let html = `
+        <div class="table-container">
+            <table class="results-table">
+                <thead>
                     <tr>
-                        <td>${student.rollNumber || 'N/A'}</td>
-                        <td>${student.studentName || 'N/A'}</td>
-                        <td>${student.fatherName || 'N/A'}</td>
-                        <td>${student.studentClass || 'N/A'}</td>
-                        <td>${student.reportTerm || student.term || 'N/A'}</td>
-                        <td>${student.academicSession || '2025-26'}</td>
-                        <td>${date}</td>
-                        <td>
-                            <button class="load-btn" onclick='loadStudentData(${JSON.stringify(student).replace(/'/g, "\\'")})'>Load</button>
-                        </td>
+                        <th>Roll No</th>
+                        <th>Name</th>
+                        <th>Father</th>
+                        <th>Class</th>
+                        <th>Report Term</th>
+                        <th>Academic Session</th>
+                        <th>Date</th>
+                        <th>Actions</th>
                     </tr>
-                `;
-            });
+                </thead>
+                <tbody>
+    `;
 
-            html += '</tbody></table></div>';
-            container.innerHTML = html;
-        }
+    pageStudents.forEach((student) => {
+        const date = student.timestamp ? new Date(student.timestamp).toLocaleDateString() : 'N/A';
+        html += `
+            <tr>
+                <td>${student.rollNumber || 'N/A'}</td>
+                <td>${student.studentName || 'N/A'}</td>
+                <td>${student.fatherName || 'N/A'}</td>
+                <td>${student.studentClass || 'N/A'}</td>
+                <td>${student.reportTerm || student.term || 'N/A'}</td>
+                <td>${student.academicSession || '2025-26'}</td>
+                <td>${date}</td>
+                <td>
+                    <button class="load-btn" onclick='loadStudentData(${JSON.stringify(student).replace(/'/g, "\\'")})'>View</button>
+                    <button class="edit-btn" onclick='editStudentData(${JSON.stringify(student).replace(/'/g, "\\'")})'>Edit</button>
+                </td>
+            </tr>
+        `;
+    });
+
+    html += `
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Pagination Controls -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding: 10px; background: var(--light); border-radius: var(--radius-sm);">
+            <div>
+                Showing ${start + 1}-${end} of ${allStudents.length} records
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn btn-secondary" onclick="changePage(-1)" ${currentPage === 1 ? 'disabled' : ''} style="padding: 8px 16px; min-width: auto;">◀ Previous</button>
+                <span style="padding: 8px 16px;">Page ${currentPage} of ${totalPages}</span>
+                <button class="btn btn-secondary" onclick="changePage(1)" ${currentPage === totalPages ? 'disabled' : ''} style="padding: 8px 16px; min-width: auto;">Next ▶</button>
+            </div>
+            <div>
+                <select onchange="changeItemsPerPage(this.value)" style="padding: 8px; border-radius: var(--radius-sm); border: 2px solid var(--gray-light);">
+                    <option value="10">10 per page</option>
+                    <option value="25" selected>25 per page</option>
+                    <option value="50">50 per page</option>
+                    <option value="100">100 per page</option>
+                </select>
+            </div>
+        </div>
+    `;
+
+    container.innerHTML = html;
+}
+
+function changePage(direction) {
+    currentPage += direction;
+    renderCurrentPage();
+}
+
+function changeItemsPerPage(value) {
+    itemsPerPage = parseInt(value);
+    currentPage = 1;
+    renderCurrentPage();
+}
 
         // =============================================
         // CLEAR SEARCH RESULTS
@@ -1812,7 +2401,7 @@
         }
 
         // =============================================
-        // LOAD STUDENT DATA (UPDATED with new fields)
+        // LOAD STUDENT DATA - Updated to handle new subject structure
         // =============================================
         function loadStudentData(student) {
             // Load new fields
@@ -1839,16 +2428,30 @@
             if (student.subjects && student.subjects.length > 0) {
                 student.subjects.forEach(subj => {
                     const row = tbody.insertRow();
+                    
+                    // Format percentage - ensure it's displayed without % symbol
+                    let percentage = subj.percentage || '-';
+                    if (percentage !== '-' && percentage.toString().includes('%')) {
+                        percentage = percentage.toString().replace('%', '');
+                    }
+                    
+                    // Create row with onchange events for inputs
                     row.innerHTML = `
-                        <td><input type="text" value="${subj.name || ''}"></td>
-                        <td><input type="number" value="${subj.totalMarks || ''}"></td>
-                        <td><input type="text" value="${subj.marksObtained || ''}"></td>
-                        <td class="percentage-display">${subj.percentage || '-'}</td>
+                        <td><input type="text" value="${subj.name || ''}" onchange="updateRow(this)"></td>
+                        <td><input type="number" value="${subj.totalMarks || ''}" onchange="updateRow(this)"></td>
+                        <td><input type="text" value="${subj.marksObtained || ''}" onchange="updateRow(this)"></td>
+                        <td class="percentage-display">${percentage}</td>
                         <td class="grade-display">${subj.grade || '-'}</td>
-                        <td><input type="text" value="${subj.remarks || ''}" placeholder="Remarks"></td>
-                        <td><input type="text" value="${subj.signature || ''}" placeholder="Signature"></td>
+                        <td><input type="text" value="${subj.remarks || ''}" placeholder="Remarks" onchange="updateRow(this)"></td>
+                        <td><input type="text" value="${subj.signature || ''}" placeholder="Signature" onchange="updateRow(this)"></td>
                         <td><button onclick="this.closest('tr').remove()" style="background:#dc3545; color:white; border:none; padding:5px 10px; border-radius:3px; cursor:pointer;">✖</button></td>
                     `;
+                    
+                    // Trigger calculation for this row to ensure grade matches marks
+                    const marksInput = row.cells[2].querySelector('input');
+                    if (marksInput) {
+                        updateRow(marksInput);
+                    }
                 });
             } else {
                 loadSubjects();
@@ -1859,7 +2462,58 @@
         }
 
         // =============================================
-        // PRINT REPORT CARD (UPDATED with new fields)
+// EDIT STUDENT DATA (Edit mode)
+// =============================================
+function editStudentData(student) {
+    // CRITICAL: Set global variables FIRST
+    isEditMode = true;
+    editingStudentTimestamp = student.timestamp;
+    editingStudentData = student;
+    window.editingStudentTimestamp = student.timestamp; // Backup
+    
+    console.log('✅ Edit mode activated for student:', student.rollNumber);
+    console.log('✅ Timestamp set to:', student.timestamp);
+    
+    // First load the data
+    loadStudentData(student);
+    
+    // Show edit mode indicator
+    document.getElementById('editModeIndicator').style.display = 'flex';
+    document.getElementById('editingRollNo').textContent = student.rollNumber;
+    
+    // Change save button to update
+    const btnSave = document.getElementById('btnSave');
+    btnSave.innerHTML = '✏️ Update Record';
+    btnSave.style.background = 'linear-gradient(135deg, #ffc107, #fd7e14)';
+    
+    // Unlock everything
+    const btnPrint = document.getElementById('btnPrint');
+    const btnClear = document.getElementById('btnClear');
+    const rollInput = document.getElementById('rollNumber');
+    
+    btnSave.disabled = false;
+    btnSave.style.opacity = "1";
+    btnSave.style.cursor = "pointer";
+    
+    btnPrint.disabled = false;
+    btnPrint.style.opacity = "1";
+    btnPrint.style.cursor = "pointer";
+    
+    btnClear.disabled = false;
+    btnClear.style.opacity = "1";
+    btnClear.style.cursor = "pointer";
+    
+    rollInput.style.borderColor = "#ffc107";
+    rollInput.style.backgroundColor = "#fff8e7";
+    
+    // Trigger duplicate check to update border color
+    setTimeout(() => checkDuplicateRollNo(), 100);
+    
+    showMessage('Edit mode enabled. Make your changes and click Update.', 'info');
+}
+
+        // =============================================
+        // PRINT REPORT CARD - UPDATED to add % symbol in PDF
         // =============================================
         function printReportCard() {
             showMessage('Preparing PDF...', 'info');
@@ -1885,7 +2539,7 @@
         }
 
         // =============================================
-        // GENERATE PRINTABLE HTML (UPDATED with new fields)
+        // GENERATE PRINTABLE HTML - UPDATED with new subject names and % symbol
         // =============================================
         function generatePrintableHTML() {
             // Use new fields with fallbacks
@@ -1896,7 +2550,7 @@
             const studentName = document.getElementById('studentName').value || 'Aleshka';
             const fatherName = document.getElementById('fatherName').value || 'Mustafa';
             const studentClass = document.getElementById('studentClass').value || 'VII';
-            const rollNo = document.getElementById('rollNumber').value || '43';
+            const rollNo = document.getElementById('rollNumber').value || '';
             const daysAttended = document.getElementById('daysAttended').value || '20';
             const totalDays = document.getElementById('totalWorkingDays').value || '126';
             const teacherComments = document.getElementById('teacherComments').value || 'Needs focus attention and consistent practice';
@@ -1914,9 +2568,14 @@
                 const subject = inputs[0].value || '______';
                 const total = inputs[1].value || '0';
                 const obtained = inputs[2].value || '0';
-                const percentage = rows[i].cells[3].innerHTML;
+                let percentage = rows[i].cells[3].innerHTML;
                 const grade = rows[i].cells[4].innerHTML;
                 const remarks = inputs[3].value || '';
+                
+                // Add % symbol for PDF display
+                if (percentage !== '-' && percentage !== 'A' && !percentage.includes('%')) {
+                    percentage = percentage + '%';
+                }
                 
                 subjectsHTML += `
                     <tr>
@@ -1938,7 +2597,7 @@
                 }
             }
 
-            const overallPercentage = totalMarksSum > 0 ? ((totalObtained / totalMarksSum) * 100).toFixed(0) : 0;
+            const overallPercentage = totalMarksSum > 0 ? ((totalObtained / totalMarksSum) * 100).toFixed(2) : 0;
             let overallGrade = 'F';
             if (overallPercentage >= 90) overallGrade = 'A+';
             else if (overallPercentage >= 80) overallGrade = 'A';
@@ -2211,60 +2870,611 @@ font-weight: 600;
             document.getElementById('loadingSpinner').style.display = show ? 'block' : 'none';
         }
 
+
+        // =============================================
+       // CLEAR FORM FUNCTION
+       // =============================================
+
         function clearForm() {
-            // Clear new fields
-            document.getElementById('academicSession').value = '2025-26';
-            document.getElementById('reportTerm').value = '1st Term';
-            document.getElementById('workingDaysTerm').value = '1st Term';
-            
-            // Clear existing fields
-            document.getElementById('studentName').value = 'Aleshka';
-            document.getElementById('fatherName').value = 'Mustafa';
-            document.getElementById('studentClass').value = 'VII';
-            document.getElementById('rollNumber').value = '43';
-            document.getElementById('daysAttended').value = '20';
-            document.getElementById('totalWorkingDays').value = '126';
-            document.getElementById('teacherComments').value = 'Needs focus attention and consistent practice';
-            document.getElementById('classTeacherSign').value = '';
-            document.getElementById('coordinatorSign').value = '';
-            document.getElementById('headMistressSign').value = '';
-            document.getElementById('parentSign').value = '';
-            loadSubjects();
-            showMessage('Form cleared', 'success');
-        }
+    // 1. Clear text and dropdown fields (Set to empty or defaults)
+    document.getElementById('academicSession').value = '2025-26';
+    document.getElementById('reportTerm').value = '1st Term';
+    document.getElementById('workingDaysTerm').value = '1st Term';
+    
+    // Clear existing fields
+    document.getElementById('studentName').value = 'Aleshka';
+    document.getElementById('fatherName').value = 'Mustafa';
+    document.getElementById('studentClass').value = 'VII';
+    document.getElementById('rollNumber').value = '';
+    document.getElementById('daysAttended').value = '20';
+    document.getElementById('totalWorkingDays').value = '126';
+    document.getElementById('teacherComments').value = 'Needs focus attention and consistent practice';
+    document.getElementById('classTeacherSign').value = '';
+    document.getElementById('coordinatorSign').value = '';
+    document.getElementById('headMistressSign').value = '';
+    document.getElementById('parentSign').value = '';
+
+    // 2. Reset the subjects table
+    loadSubjects();
+
+    // 3. RESET GLOBAL VARIABLES
+    isEditMode = false;
+    editingStudentTimestamp = null;
+    editingStudentData = null;
+    window.editingStudentTimestamp = null;
+    pendingDuplicateData = null;
+    
+    // 4. HIDE THE EDIT MODE INDICATOR ← ADD THIS LINE
+    document.getElementById('editModeIndicator').style.display = 'none';
+    
+    // Close modal if it's open
+    const modal = document.getElementById('duplicateModal');
+    if (modal) {
+        modal.classList.remove('active');
+    }
+
+    // 5. RESET BUTTONS AND INPUT STYLES
+    const btnSave = document.getElementById('btnSave');
+    const btnPrint = document.getElementById('btnPrint');
+    const rollInput = document.getElementById('rollNumber');
+
+    if (btnSave) {
+        btnSave.disabled = false;
+        btnSave.style.opacity = "1";
+        btnSave.style.cursor = "pointer";
+        btnSave.innerHTML = "💾 Save to Sheet";
+        btnSave.style.background = "linear-gradient(135deg, var(--primary), var(--primary-light))";
+    }
+    if (btnPrint) {
+        btnPrint.disabled = false;
+        btnPrint.style.opacity = "1";
+        btnPrint.style.cursor = "pointer";
+    }
+    if (rollInput) {
+        rollInput.style.borderColor = "#ddd";
+        rollInput.style.backgroundColor = "#ffffff";
+    }
+    
+    // 6. Cancel edit mode if active (calls cancelEdit which also resets)
+    if (isEditMode) {
+        cancelEdit();
+    }
+    
+    // 7. Final success message
+    showMessage('Form cleared and unlocked', 'success');
+}
 
 
-// --- DUPLICATE CHECK LOGIC ---
+// =============================================
+// DUPLICATE CHECK FUNCTION - USES GLOBAL VARIABLES
+// =============================================
 async function checkDuplicateRollNo() {
-    const rollNo = document.getElementById('rollNumber').value.trim();
-    // This finds the Script URL you pasted in the settings box of your app
+    // Ensure we're reading the latest global state
+    console.log("🟢 checkDuplicateRollNo started");
+    
+    const rollInput = document.getElementById('rollNumber');
+    const rollNo = rollInput.value.trim();
     const scriptUrl = document.getElementById('appsScriptUrl').value;
 
-    // If the box is empty or the URL is missing, do nothing
-    if (!rollNo || !scriptUrl) return;
+    console.log("   Roll number:", rollNo);
+    console.log("   Script URL:", scriptUrl ? "✅ Present" : "❌ Missing");
+
+    if (!rollNo || !scriptUrl) {
+        console.log("   ❌ Missing roll number or URL - exiting");
+        return;
+    }
+
+    // Cancel previous check if still running
+    if (activeCheck) {
+        console.log("   ⚠️ Aborting previous check");
+        activeCheck.abort = true;
+    }
+
+    const btnSave = document.getElementById('btnSave');
+    const btnPrint = document.getElementById('btnPrint');
+    const modal = document.getElementById('duplicateModal');
+    
+    // --- USE GLOBAL VARIABLES DIRECTLY ---
+    const currentTimestamp = (isEditMode && editingStudentTimestamp) ? editingStudentTimestamp : "";
+
+    console.log("🛠️ Mode Check - Global isEditMode:", isEditMode);
+    console.log("🛠️ Mode Check - Global Timestamp:", currentTimestamp);
+
+    // Create new check object
+    const thisCheck = { id: Date.now(), abort: false };
+    activeCheck = thisCheck;
+
+    // Hide modal immediately
+    modal?.classList.remove('active');
 
     try {
-        // This sends a secret message to your Google Sheet to ask: "Does this ID exist?"
-        const response = await fetch(`${scriptUrl}?action=checkDuplicate&rollNo=${rollNo}`);
+        const url = `${scriptUrl}?action=checkDuplicate&rollNo=${encodeURIComponent(rollNo)}&currentTimestamp=${encodeURIComponent(currentTimestamp)}`;
+        console.log("   Calling URL:", url);
+        
+        const response = await fetch(url);
         const result = await response.json();
 
-        if (result.exists) {
-            // 1. Show the red warning modal you already have in your HTML
+        if (thisCheck.abort) {
+            console.log("   ⚠️ Check aborted - ignoring result");
+            return;
+        }
+
+        console.log("   ✅ Result:", result);
+
+        if (result.isDuplicate) {
+            console.log("   🔴 DUPLICATE FOUND");
+            pendingDuplicateData = result.student;
             document.getElementById('dupRollNo').textContent = rollNo;
-            document.getElementById('duplicateModal').classList.add('active');
+            modal?.classList.add('active');
             
-            // 2. Turn the box border red to show an error
-            document.getElementById('rollNumber').style.borderColor = "#dc3545";
-            document.getElementById('rollNumber').style.backgroundColor = "#fff8f8";
+            rollInput.style.borderColor = "#dc3545";
+            rollInput.style.backgroundColor = "#fff8f8";
+
+            if (btnSave) {
+                btnSave.disabled = true;
+                btnSave.style.opacity = "0.5";
+                btnSave.style.cursor = "not-allowed";
+                btnSave.innerText = "⚠️ Duplicate Found";
+            }
+            if (btnPrint) {
+                btnPrint.disabled = true;
+                btnPrint.style.opacity = "0.5";
+                btnPrint.style.cursor = "not-allowed";
+            }
         } else {
-            // If it's not a duplicate, keep the box normal
-            document.getElementById('rollNumber').style.borderColor = "#28a745";
-            document.getElementById('rollNumber').style.backgroundColor = "#ffffff";
+            console.log("   🟢 NO DUPLICATE");
+            
+            // Reset UI using GLOBAL VARIABLES
+            if (btnSave) {
+                btnSave.disabled = false;
+                btnSave.style.opacity = "1";
+                btnSave.style.cursor = "pointer";
+                btnSave.innerHTML = isEditMode ? "✏️ Update Record" : "💾 Save to Sheet";
+            }
+            if (btnPrint) {
+                btnPrint.disabled = false;
+                btnPrint.style.opacity = "1";
+                btnPrint.style.cursor = "pointer";
+            }
+
+            if (result.isSameRecord) {
+                console.log("   🟡 SAME RECORD");
+                rollInput.style.borderColor = "#ffc107";
+                rollInput.style.backgroundColor = "#fff8e7";
+            } else {
+                console.log("   🟢 NEW RECORD");
+                rollInput.style.borderColor = "#28a745";
+                rollInput.style.backgroundColor = "#ffffff";
+            }
         }
     } catch (error) {
-        console.error("Duplicate check failed:", error);
+        console.error("   ❌ Error:", error);
+    } finally {
+        if (activeCheck === thisCheck) {
+            activeCheck = null;
+        }
+        console.log("   ✅ Check complete");
     }
 }
+
+// =============================================
+// EXPORT FUNCTIONS
+// =============================================
+
+// Show export options modal (with toggle check)
+function showExportOptions() {
+    if (!EXPORT_ENABLED) {
+        // Show disabled modal
+        document.getElementById('exportDisabledModal').classList.add('active');
+        return;
+    }
+    
+    // Show normal export options
+    document.getElementById('exportModal').classList.add('active');
+}
+
+// Close export disabled modal
+function closeExportDisabledModal() {
+    document.getElementById('exportDisabledModal').classList.remove('active');
+}
+
+// Close export modal
+function closeExportModal() {
+    document.getElementById('exportModal').classList.remove('active');
+}
+
+// Handle export based on selected option
+function handleExport() {
+    const selectedOption = document.querySelector('input[name="exportType"]:checked').value;
+    
+    switch(selectedOption) {
+        case 'current':
+            exportCurrentView();
+            break;
+        case 'filtered':
+            exportFilteredData();
+            break;
+        case 'all':
+            exportAllData();
+            break;
+        case 'summary':
+            exportSummaryReport();
+            break;
+    }
+    
+    closeExportModal();
+}
+
+// Export current view (what's shown in the table)
+function exportCurrentView() {
+    // Get the table rows from the displayed results
+    const table = document.querySelector('.results-table');
+    if (!table) {
+        showMessage('No data to export', 'error');
+        return;
+    }
+    
+    let csv = '';
+    
+    // Get headers from table
+    const headers = [];
+    table.querySelectorAll('thead th').forEach(th => {
+        if (th.textContent !== 'Actions') { // Skip Actions column
+            headers.push(th.textContent);
+        }
+    });
+    csv += headers.join(',') + '\n';
+    
+    // Get data from table rows
+    table.querySelectorAll('tbody tr').forEach(row => {
+        const rowData = [];
+        row.querySelectorAll('td').forEach((td, index) => {
+            if (index < headers.length) { // Skip Actions column
+                rowData.push('"' + td.textContent + '"');
+            }
+        });
+        csv += rowData.join(',') + '\n';
+    });
+    
+    downloadCSV(csv, 'current_view.csv');
+    showMessage('✅ Current view exported successfully!', 'success');
+}
+
+// Export filtered data (all students matching current filters)
+function exportFilteredData() {
+    const grade = document.getElementById('gradeFilter').value;
+    const section = document.getElementById('sectionFilter').value;
+    const rollNo = document.getElementById('searchRollNo').value.trim();
+    
+    // Get all students from localStorage
+    let students = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+    
+    // Apply filters (same logic as applyFilters)
+    if (grade !== 'all') {
+        students = students.filter(s => {
+            const classStr = s.studentClass || '';
+            if (classStr.includes('-')) {
+                return classStr.split('-')[0].trim() === grade;
+            }
+            return classStr === grade;
+        });
+    }
+    
+    if (section !== 'all') {
+        students = students.filter(s => {
+            const classStr = s.studentClass || '';
+            if (classStr.includes('-')) {
+                return classStr.split('-')[1].trim() === section;
+            }
+            return false;
+        });
+    }
+    
+    if (rollNo) {
+        students = students.filter(s => s.rollNumber == rollNo);
+    }
+    
+    if (students.length === 0) {
+        showMessage('No students match the filters', 'error');
+        return;
+    }
+    
+    // Create CSV
+    let csv = 'Roll No,Student Name,Father Name,Class,Report Term,Academic Session,Date\n';
+    
+    students.forEach(s => {
+        const date = s.timestamp ? new Date(s.timestamp).toLocaleDateString() : 'N/A';
+        csv += `"${s.rollNumber || ''}","${s.studentName || ''}","${s.fatherName || ''}","${s.studentClass || ''}","${s.reportTerm || s.term || ''}","${s.academicSession || ''}","${date}"\n`;
+    });
+    
+    downloadCSV(csv, 'filtered_students.csv');
+    showMessage(`✅ Exported ${students.length} students!`, 'success');
+}
+
+// Export ALL data (complete with all subjects)
+function exportAllData() {
+    const students = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+    
+    if (students.length === 0) {
+        showMessage('No data to export', 'error');
+        return;
+    }
+    
+    // Build headers
+    let headers = [
+        'Timestamp', 'Roll No', 'Student Name', 'Father Name', 'Class/Section',
+        'Academic Session', 'Report Term', 'Working Days Term',
+        'Days Attended', 'Total Working Days', 'Teacher Comments',
+        'Class Teacher Sign', 'Coordinator Sign', 'Head Mistress Sign', 'Parent Sign'
+    ];
+    
+    // Add subject headers
+    const subjects = ['English', 'Urdu', 'Maths', 'Science', 'S. Studies', 'Islamiyat', 'Sindhi', 'Computer'];
+    subjects.forEach(subj => {
+        headers.push(
+            `${subj} Total Marks`,
+            `${subj} Marks`,
+            `${subj} Grade`,
+            `${subj} Percentage`,
+            `${subj} Remarks`,
+            `${subj} Teacher Sign`,
+            `${subj} Last Updated`
+        );
+    });
+    
+    // Add summary headers
+    headers.push('Total Marks', 'Obtained Marks', 'Overall Percentage', 'Overall Grade', 'Status');
+    
+    let csv = headers.join(',') + '\n';
+    
+    // Add data rows
+    students.forEach(s => {
+        const row = [
+            `"${s.timestamp || ''}"`,
+            `"${s.rollNumber || ''}"`,
+            `"${s.studentName || ''}"`,
+            `"${s.fatherName || ''}"`,
+            `"${s.studentClass || ''}"`,
+            `"${s.academicSession || ''}"`,
+            `"${s.reportTerm || s.term || ''}"`,
+            `"${s.workingDaysTerm || ''}"`,
+            `"${s.daysAttended || ''}"`,
+            `"${s.totalWorkingDays || ''}"`,
+            `"${s.teacherComments || ''}"`,
+            `"${s.classTeacherSign || ''}"`,
+            `"${s.coordinatorSign || ''}"`,
+            `"${s.headMistressSign || ''}"`,
+            `"${s.parentSign || ''}"`
+        ];
+        
+        // Add subject data
+        subjects.forEach(subjName => {
+            const subject = s.subjects?.find(sub => sub.name === subjName) || {};
+            row.push(
+                `"${subject.totalMarks || ''}"`,
+                `"${subject.marksObtained || ''}"`,
+                `"${subject.grade || ''}"`,
+                `"${subject.percentage || ''}"`,
+                `"${subject.remarks || ''}"`,
+                `"${subject.signature || ''}"`,
+                `"${subject.lastUpdated || ''}"`
+            );
+        });
+        
+        // Add summary (you might need to calculate these)
+        row.push('', '', '', '', 'Active');
+        
+        csv += row.join(',') + '\n';
+    });
+    
+    downloadCSV(csv, `all_students_${new Date().toISOString().slice(0,10)}.csv`);
+    showMessage(`✅ Exported ${students.length} students with all data!`, 'success');
+}
+
+// Export summary report - FIXED with "No Marks" category
+function exportSummaryReport() {
+    const students = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+    
+    if (students.length === 0) {
+        showMessage('No data to export', 'error');
+        return;
+    }
+    
+    console.log('=== EXPORT DEBUG ===');
+    console.log('Total students:', students.length);
+    console.log('First student sample:', students[0]);
+    
+    // Helper function to calculate grade from percentage
+    function calculateGradeFromPercentage(percentage) {
+        const p = parseFloat(percentage);
+        if (isNaN(p)) return 'No Marks';
+        if (p >= 90) return 'A+';
+        if (p >= 80) return 'A';
+        if (p >= 70) return 'B';
+        if (p >= 60) return 'C';
+        if (p >= 50) return 'D';
+        if (p >= 40) return 'E';
+        return 'F';
+    }
+    
+    // Calculate statistics
+    const totalStudents = students.length;
+    
+    // Class breakdown
+    const classBreakdown = {};
+    
+    // Grade distribution - ADDED "No Marks" category
+    const gradeDist = { 
+        'A+': 0, 
+        'A': 0, 
+        'B': 0, 
+        'C': 0, 
+        'D': 0, 
+        'E': 0, 
+        'F': 0,
+        'No Marks': 0  // NEW category for students with no marks
+    };
+    
+    // Track calculation issues
+    let studentsWithNoMarks = 0;
+    let studentsWithZeroTotal = 0;
+    let studentsWithSomeMarks = 0;
+    
+    students.forEach((s, index) => {
+        // Class breakdown
+        const className = s.studentClass || 'Unknown';
+        classBreakdown[className] = (classBreakdown[className] || 0) + 1;
+        
+        // Calculate overall percentage from subjects
+        let totalMarks = 0;
+        let obtainedMarks = 0;
+        let hasAnyMarks = false;
+        
+        console.log(`\n--- Student ${index + 1}: ${s.studentName || 'Unnamed'} (Roll: ${s.rollNumber || 'N/A'}) ---`);
+        
+        if (s.subjects && s.subjects.length > 0) {
+            console.log(`  Subjects found: ${s.subjects.length}`);
+            
+            s.subjects.forEach((subject, subjIndex) => {
+                const total = parseFloat(subject.totalMarks) || 0;
+                const obtained = parseFloat(subject.marksObtained) || 0;
+                
+                // Check if this subject has actual marks
+                if (subject.marksObtained && subject.marksObtained.toString().trim() !== '') {
+                    hasAnyMarks = true;
+                }
+                
+                console.log(`    ${subject.name}: total=${total}, obtained=${obtained}, marksObtained="${subject.marksObtained}"`);
+                
+                if (subject.marksObtained && subject.marksObtained.toString().toUpperCase() !== 'A') {
+                    totalMarks += total;
+                    obtainedMarks += obtained;
+                } else if (subject.marksObtained && subject.marksObtained.toString().toUpperCase() === 'A') {
+                    totalMarks += total;
+                    console.log(`    ⚠️ Student got 'A' in ${subject.name}`);
+                }
+            });
+        } else {
+            console.log(`  ❌ No subjects found for this student!`);
+            studentsWithNoMarks++;
+        }
+        
+        console.log(`  Has any marks: ${hasAnyMarks}`);
+        console.log(`  Total Marks: ${totalMarks}, Obtained Marks: ${obtainedMarks}`);
+        
+        // Calculate overall percentage and grade
+        let overallPercentage = 0;
+        let overallGrade = 'No Marks'; // Default to No Marks
+        
+        if (!hasAnyMarks) {
+            // Student has NO marks at all
+            console.log(`  ℹ️ Student has no marks - categorizing as "No Marks"`);
+            studentsWithNoMarks++;
+            overallGrade = 'No Marks';
+        } else if (totalMarks > 0) {
+            overallPercentage = (obtainedMarks / totalMarks) * 100;
+            overallGrade = calculateGradeFromPercentage(overallPercentage);
+            console.log(`  Overall Percentage: ${overallPercentage.toFixed(2)}%`);
+            console.log(`  Overall Grade: ${overallGrade}`);
+            studentsWithSomeMarks++;
+        } else {
+            console.log(`  ⚠️ Total marks is 0, cannot calculate percentage`);
+            studentsWithZeroTotal++;
+            overallGrade = 'No Marks';
+        }
+        
+        // Count the grade
+        if (gradeDist.hasOwnProperty(overallGrade)) {
+            gradeDist[overallGrade]++;
+        } else {
+            gradeDist['No Marks']++;
+        }
+    });
+    
+    console.log('\n=== EXPORT SUMMARY ===');
+    console.log('Students with no subjects:', studentsWithNoMarks);
+    console.log('Students with zero total marks:', studentsWithZeroTotal);
+    console.log('Students with some marks:', studentsWithSomeMarks);
+    console.log('Grade Distribution:', gradeDist);
+    
+    // Subject averages (only count students with marks)
+    const subjectAverages = {};
+    const subjectCounts = {};
+    
+    students.forEach(s => {
+        if (s.subjects) {
+            s.subjects.forEach(subject => {
+                // Only count if student actually has marks
+                if (subject.marksObtained && subject.marksObtained.toString().trim() !== '') {
+                    if (!subjectAverages[subject.name]) {
+                        subjectAverages[subject.name] = 0;
+                        subjectCounts[subject.name] = 0;
+                    }
+                    if (!isNaN(parseFloat(subject.marksObtained))) {
+                        subjectAverages[subject.name] += parseFloat(subject.marksObtained);
+                        subjectCounts[subject.name]++;
+                    }
+                }
+            });
+        }
+    });
+    
+    // Calculate averages
+    Object.keys(subjectAverages).forEach(subj => {
+        if (subjectCounts[subj] > 0) {
+            subjectAverages[subj] = (subjectAverages[subj] / subjectCounts[subj]).toFixed(2);
+        }
+    });
+    
+    let csv = '=== STUDENT SUMMARY REPORT ===\n';
+    csv += `Generated on,${new Date().toLocaleString()}\n`;
+    csv += `Total Students,${totalStudents}\n\n`;
+    
+    csv += '=== CLASS BREAKDOWN ===\n';
+    csv += 'Class,Count\n';
+    Object.keys(classBreakdown).sort().forEach(c => {
+        csv += `${c},${classBreakdown[c]}\n`;
+    });
+    
+    csv += '\n=== OVERALL GRADE DISTRIBUTION ===\n';
+    csv += 'Grade,Count\n';
+    // Show all grades including No Marks
+    ['A+', 'A', 'B', 'C', 'D', 'E', 'F', 'No Marks'].forEach(g => {
+        csv += `${g},${gradeDist[g] || 0}\n`;
+    });
+    
+    csv += '\n=== SUBJECT AVERAGES (Students with marks only) ===\n';
+    csv += 'Subject,Average Marks,Students Count\n';
+    Object.keys(subjectAverages).sort().forEach(subj => {
+        csv += `${subj},${subjectAverages[subj]},${subjectCounts[subj]}\n`;
+    });
+    
+    csv += '\n=== DEBUG INFO ===\n';
+    csv += `Students with no marks at all,${studentsWithNoMarks}\n`;
+    csv += `Students with zero total marks (calculation issue),${studentsWithZeroTotal}\n`;
+    csv += `Students with some marks,${studentsWithSomeMarks}\n`;
+    
+    downloadCSV(csv, 'summary_report.csv');
+    showMessage('✅ Summary report exported! Check console for debug info.', 'success');
+}
+
+
+// Helper function to download CSV
+function downloadCSV(csv, filename) {
+    const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' }); // \uFEFF for UTF-8 BOM
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    
+    link.setAttribute('href', url);
+    link.setAttribute('download', filename);
+    link.style.visibility = 'hidden';
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+
     </script>
 </body>
 </html>
