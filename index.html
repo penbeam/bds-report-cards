@@ -1170,7 +1170,7 @@ button:not(:disabled):hover {
             </a>
             
             <!-- Call Button with hover effect -->
-            <a href="tel:+923322991032" class="contact-btn" style="display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: #6c757d; color: white; padding: 12px 20px; border-radius: 40px; text-decoration: none; font-weight: 500; font-size: 14px; transition: all 0.3s ease; flex: 1 1 auto; min-width: 120px; border: none; cursor: pointer;">
+            <a href="tel:+923023993489" class="contact-btn" style="display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: #6c757d; color: white; padding: 12px 20px; border-radius: 40px; text-decoration: none; font-weight: 500; font-size: 14px; transition: all 0.3s ease; flex: 1 1 auto; min-width: 120px; border: none; cursor: pointer;">
                 <span style="font-size: 18px;">📞</span>
                 <span>Call</span>
             </a>
@@ -1964,6 +1964,10 @@ function closeDuplicateModal() {
             
             // Clear form
             clearForm();
+
+            // ✅ ADD THIS LINE - Update dashboard
+            updateDashboardMetrics();
+
         }
 
         // =============================================
@@ -2028,6 +2032,7 @@ function closeDuplicateModal() {
                 .then(data => {
                     if (data && data.students && data.students.length > 0) {
                         // Store in localStorage
+                        localStorage.removeItem(STORAGE_KEY);  // Clear old data first
                         localStorage.setItem(STORAGE_KEY, JSON.stringify(data.students));
                         
                         // Populate filters
@@ -2043,7 +2048,10 @@ function closeDuplicateModal() {
                     } else {
                         document.getElementById('searchResults').innerHTML = '<div class="message info">No student records found</div>';
 
-                        // Metrics Update Call
+                        // Clear localStorage when no data
+                        localStorage.removeItem(STORAGE_KEY);
+
+                        // Update dashboard with empty data
                         updateDashboardMetrics();
 
                         showMessage('No records found', 'info');
@@ -2054,6 +2062,9 @@ function closeDuplicateModal() {
                     setLoading(false);
                     showMessage('❌ Failed to fetch: ' + error.message, 'error');
                     console.error('Fetch error:', error);
+
+                    // Also update dashboard on error
+                    updateDashboardMetrics();
                 });
         }
 
@@ -2494,6 +2505,10 @@ function jumpToPage(page) {
             document.getElementById('gradeFilter').value = 'all';
             document.getElementById('sectionFilter').innerHTML = '<option value="all">All Sections</option>';
             document.getElementById('activeFilters').style.display = 'none';
+
+            // ✅ ADD THIS LINE - Update dashboard
+            updateDashboardMetrics();
+
             showMessage('Search results cleared', 'success');
         }
 
