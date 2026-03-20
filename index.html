@@ -1124,6 +1124,41 @@ button:not(:disabled):hover {
 }
 
 
+/* Button with spinner */
+.btn-loading {
+    position: relative;
+    color: transparent !important;
+    pointer-events: none;
+    opacity: 0.8;
+}
+
+.btn-loading::after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    top: 50%;
+    left: 50%;
+    margin-left: -10px;
+    margin-top: -10px;
+    border: 3px solid rgba(255,255,255,0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Disabled button style */
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+
     </style>
 </head>
 <body>
@@ -1755,9 +1790,15 @@ function closeDuplicateModal() {
             }
         }
 
+        // =============================================
+        // DUPLICATE CHECK FUNCTION
+        // =============================================
+
         function checkDuplicateRollNumber(rollNumber) {
             return new Promise((resolve, reject) => {
                 const url = document.getElementById('appsScriptUrl').value;
+                
+                console.log('🔍 Checking duplicate for roll:', rollNumber); // Optional debug
                 
                 if (!url || url === 'YOUR_APPS_SCRIPT_URL_HERE') {
                     resolve({ isDuplicate: false }); // Skip check if no URL
@@ -1767,6 +1808,7 @@ function closeDuplicateModal() {
                 const callbackName = 'dup_check_' + Date.now();
                 
                 window[callbackName] = function(response) {
+                    console.log('📥 Duplicate check response:', response); // Optional debug
                     delete window[callbackName];
                     if (response && response.isDuplicate) {
                         resolve(response);
@@ -1779,6 +1821,7 @@ function closeDuplicateModal() {
                 script.src = url + '?callback=' + callbackName + '&action=checkDuplicate&rollNumber=' + encodeURIComponent(rollNumber);
                 
                 script.onerror = function() {
+                    console.log('❌ Duplicate check script error'); // Optional debug
                     delete window[callbackName];
                     resolve({ isDuplicate: false }); // Assume no duplicate on error
                 };
@@ -1788,6 +1831,7 @@ function closeDuplicateModal() {
                 // Timeout
                 setTimeout(() => {
                     if (window[callbackName]) {
+                        console.log('⏱️ Duplicate check timeout'); // Optional debug
                         delete window[callbackName];
                         resolve({ isDuplicate: false });
                     }
@@ -1821,7 +1865,62 @@ function closeDuplicateModal() {
             }
         }
 
-        async function saveOrUpdate() {
+// =============================================
+// BUTTON LOADING STATES 
+// =============================================
+
+// Show loading state on button
+function setButtonLoading(button, isLoading, isEditMode = false) {
+    if (!button) return;
+    
+    if (isLoading) {
+        button.disabled = true;
+        button.classList.add('btn-loading');
+        // Store original text to restore later
+        button.dataset.originalText = button.innerHTML;
+        button.dataset.originalBg = button.style.background;
+    } else {
+        button.disabled = false;
+        button.classList.remove('btn-loading');
+        // Restore original text and style
+        if (button.dataset.originalText) {
+            button.innerHTML = button.dataset.originalText;
+        } else {
+            button.innerHTML = isEditMode ? "✏️ Update Record" : "💾 Save to Sheet";
+        }
+        if (button.dataset.originalBg) {
+            button.style.background = button.dataset.originalBg;
+        } else {
+            button.style.background = isEditMode 
+                ? "linear-gradient(135deg, #ffc107, #fd7e14)" 
+                : "linear-gradient(135deg, var(--primary), var(--primary-light))";
+        }
+    }
+}
+
+// =============================================
+// Show loading on Save button
+// =============================================
+function showSaveLoading() {
+    const btnSave = document.getElementById('btnSave');
+    const isEditMode = btnSave?.innerText.includes('Update');
+    setButtonLoading(btnSave, true, isEditMode);
+}
+
+// =============================================
+// Hide loading on Save button
+// =============================================
+function hideSaveLoading() {
+    const btnSave = document.getElementById('btnSave');
+    const isEditMode = btnSave?.innerText.includes('Update');
+    setButtonLoading(btnSave, false, isEditMode);
+}
+
+        // =============================================
+        // SAVE OR UPDATE BUTTON FUNCTIONALITIES
+        // =============================================
+
+     async function saveOrUpdate() {
     // Add this check at the very beginning
     const rollInput = document.getElementById('rollNumber');
     if (rollInput.style.borderColor === "rgb(220, 53, 69)") { // Red border color
@@ -1845,8 +1944,12 @@ function closeDuplicateModal() {
 
     const rollNumber = document.getElementById('rollNumber').value;
     
+    // Prevent duplicate clicks
+    const btnSave = document.getElementById('btnSave');
+    if (btnSave.disabled) return;
+
     // --- THE GATEKEEPER - ALWAYS CHECK DUPLICATES ---
-    setLoading(true);
+    showSaveLoading(); // ← Show spinner on button
     showMessage('Checking for duplicates...', 'info');
     
     const duplicateCheck = await checkDuplicateRollNumber(rollNumber);
@@ -1861,9 +1964,9 @@ function closeDuplicateModal() {
         
         if (!isEditingSameStudent) {
             // This is a DIFFERENT student with same roll number - BLOCK IT!
-            setLoading(false);
+            hideSaveLoading(); // ← Hide spinner before showing modal
             showDuplicateModal(rollNumber, duplicateCheck.student);
-            return; // ← CRITICAL: This STOPS the save completely
+            return;
         }
         // If it's the same student, we allow the update to proceed
     }
@@ -1872,7 +1975,7 @@ function closeDuplicateModal() {
     // 1. No duplicate found, OR
     // 2. Duplicate found but it's the same student being edited
     
-    setLoading(true);
+    // Button already has spinner, just update message
     showMessage(isEditMode ? 'Updating record...' : 'Saving to Google Sheet...', 'info');
 
     // Collect all data
@@ -1928,7 +2031,7 @@ function closeDuplicateModal() {
         body: JSON.stringify(postData)
     })
     .then(() => {
-        setLoading(false);
+        hideSaveLoading(); // ← Hide spinner
         showMessage(isEditMode ? '✅ Record updated successfully!' : '✅ Data saved to Google Sheet successfully!', 'success');
 
         // ✅ Dashboard Update Call
@@ -1939,7 +2042,7 @@ function closeDuplicateModal() {
         }
     })
     .catch(error => {
-        setLoading(false);
+        hideSaveLoading(); // ← Hide spinner even on error
         showMessage(isEditMode ? '⚠️ Record updated locally. Sheet error: ' + error.message : '❌ Error saving to sheet: ' + error.message, 'info');
         
         if (isEditMode) {
@@ -2574,9 +2677,9 @@ function jumpToPage(page) {
         }
 
         // =============================================
-// EDIT STUDENT DATA (Edit mode)
-// =============================================
-function editStudentData(student) {
+        // EDIT STUDENT DATA (Edit mode)
+       // =============================================
+     function editStudentData(student) {
     // CRITICAL: Set global variables FIRST
     isEditMode = true;
     editingStudentTimestamp = student.timestamp;
