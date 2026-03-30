@@ -1223,7 +1223,7 @@ button:not(:disabled):hover {
                 <span>🔗 Google Apps Script URL</span>
             </div>
             <div class="url-input-group">
-                <input type="text" id="appsScriptUrl" placeholder="https://script.google.com/macros/s/.../exec" value="https://script.google.com/macros/s/AKfycbyl_KanGZ1sl63hDfHw8kxeFvLvXceVtuqcWAcIms0NkWg6ogrg4uAx5IL1WkGxsnHFrA/exec">
+                <input type="text" id="appsScriptUrl" placeholder="https://script.google.com/macros/s/.../exec" value="https://script.google.com/macros/s/AKfycbzcPcicjtZ3AvwU2FktAVXkQiHpGr-d0q0u4IjRJtvn7S_FThQFdrKpBDvqZZXfOQ7oTA/exec">
                 <span id="connectionStatus" class="status-badge status-disconnected">🔴 Not Configured</span>
             </div>
         </div>
@@ -1425,8 +1425,8 @@ button:not(:disabled):hover {
                         <input type="text" id="classTeacherSign" placeholder="Signature">
                     </div>
                     <div class="signature-field">
-                        <label>Coordinator</label>
-                        <input type="text" id="coordinatorSign" placeholder="Signature">
+                        <label>Admin</label>
+                        <input type="text" id="adminSign" placeholder="Signature">
                     </div>
                     <div class="signature-field">
                         <label>Head Mistress</label>
@@ -1992,7 +1992,7 @@ function hideSaveLoading() {
         totalWorkingDays: document.getElementById('totalWorkingDays').value,
         teacherComments: document.getElementById('teacherComments').value,
         classTeacherSign: document.getElementById('classTeacherSign').value,
-        coordinatorSign: document.getElementById('coordinatorSign').value,
+        adminSign: document.getElementById('adminSign').value,
         headMistressSign: document.getElementById('headMistressSign').value,
         parentSign: document.getElementById('parentSign').value,
         timestamp: isEditMode && editingStudentTimestamp ? editingStudentTimestamp : new Date().toISOString(),
@@ -2633,7 +2633,7 @@ function jumpToPage(page) {
             document.getElementById('totalWorkingDays').value = student.totalWorkingDays || '90';
             document.getElementById('teacherComments').value = student.teacherComments || 'Needs focus attention and consistent practice';
             document.getElementById('classTeacherSign').value = student.classTeacherSign || '';
-            document.getElementById('coordinatorSign').value = student.coordinatorSign || '';
+            document.getElementById('adminSign').value = student.adminSign || '';
             document.getElementById('headMistressSign').value = student.headMistressSign || '';
             document.getElementById('parentSign').value = student.parentSign || '';
 
@@ -3039,7 +3039,7 @@ font-weight: 600;
 
         <div class="signatures">
             <div class="signature-item"><div class="signature-line"></div><div>Class Teacher Signature</div></div>
-            <div class="signature-item"><div class="signature-line"></div><div>Coordinator Signature</div></div>
+            <div class="signature-item"><div class="signature-line"></div><div>Admin Signature</div></div>
             <div class="signature-item"><div class="signature-line"></div><div>Head Mistress Signature</div></div>
             <div class="signature-item"><div class="signature-line"></div><div>Parent Signature</div></div>
         </div>
@@ -3105,7 +3105,7 @@ font-weight: 600;
     document.getElementById('totalWorkingDays').value = '126';
     document.getElementById('teacherComments').value = 'Needs focus attention and consistent practice';
     document.getElementById('classTeacherSign').value = '';
-    document.getElementById('coordinatorSign').value = '';
+    document.getElementById('adminSign').value = '';
     document.getElementById('headMistressSign').value = '';
     document.getElementById('parentSign').value = '';
 
@@ -3420,7 +3420,7 @@ function exportAllData() {
         'Timestamp', 'Roll No', 'Student Name', 'Father Name', 'Class/Section',
         'Academic Session', 'Report Term', 'Working Days Term',
         'Days Attended', 'Total Working Days', 'Teacher Comments',
-        'Class Teacher Sign', 'Coordinator Sign', 'Head Mistress Sign', 'Parent Sign'
+        'Class Teacher Sign', 'Admin Sign', 'Head Mistress Sign', 'Parent Sign'
     ];
     
     // Add subject headers
@@ -3457,7 +3457,7 @@ function exportAllData() {
             `"${s.totalWorkingDays || ''}"`,
             `"${s.teacherComments || ''}"`,
             `"${s.classTeacherSign || ''}"`,
-            `"${s.coordinatorSign || ''}"`,
+            `"${s.adminSign || ''}"`,
             `"${s.headMistressSign || ''}"`,
             `"${s.parentSign || ''}"`
         ];
