@@ -3039,7 +3039,11 @@ font-weight: 600;
 
         <div class="signatures">
             <div class="signature-item"><div class="signature-line"></div><div>Class Teacher Signature</div></div>
-            <div class="signature-item"><div class="signature-line"></div><div>Admin Signature</div></div>
+            <div class="signature-item">
+        ${document.getElementById('adminSign').value ? `<div style="font-size: 12px; font-weight: bold; margin-bottom: 5px;">${document.getElementById('adminSign').value}</div>` : ''}
+        <div class="signature-line"></div>
+        <div>Admin Signature</div>
+    </div>
             <div class="signature-item"><div class="signature-line"></div><div>Head Mistress Signature</div></div>
             <div class="signature-item"><div class="signature-line"></div><div>Parent Signature</div></div>
         </div>
