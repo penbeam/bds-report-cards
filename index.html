@@ -3038,15 +3038,27 @@ font-weight: 600;
         <div class="comments-box"><div><strong>Class Teacher's Comments:</strong></div><div style="margin-top:10px; font-style:italic;">${teacherComments}</div></div>
 
         <div class="signatures">
-            <div class="signature-item"><div class="signature-line"></div><div>Class Teacher Signature</div></div>
-            <div class="signature-item">
-        ${document.getElementById('adminSign').value ? `<div style="font-size: 12px; font-weight: bold; margin-bottom: 0px;">${document.getElementById('adminSign').value}</div>` : ''}
+    <div class="signature-item">
+        <div style="font-size: 12px; font-weight: bold; height: 18px;">&nbsp;</div>
+        <div class="signature-line"></div>
+        <div>Class Teacher Signature</div>
+    </div>
+    <div class="signature-item">
+        <div style="font-size: 12px; font-weight: bold; height: 18px;">${(() => { const name = document.getElementById('adminSign').value; return name ? name : '&nbsp;'; })()}</div>
         <div class="signature-line"></div>
         <div>Admin Signature</div>
     </div>
-            <div class="signature-item"><div class="signature-line"></div><div>Head Mistress Signature</div></div>
-            <div class="signature-item"><div class="signature-line"></div><div>Parent Signature</div></div>
-        </div>
+    <div class="signature-item">
+        <div style="font-size: 12px; font-weight: bold; height: 18px;">&nbsp;</div>
+        <div class="signature-line"></div>
+        <div>Head Mistress Signature</div>
+    </div>
+    <div class="signature-item">
+        <div style="font-size: 12px; font-weight: bold; height: 18px;">&nbsp;</div>
+        <div class="signature-line"></div>
+        <div>Parent Signature</div>
+    </div>
+</div>
 
         <div class="date">Date: ${new Date().toLocaleDateString()}</div>
     </div>
