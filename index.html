@@ -2119,7 +2119,7 @@ function hideSaveLoading() {
 
                 // Create script element
                 const script = document.createElement('script');
-                script.src = url + '?callback=' + callbackName;
+                script.src = url + '?callback=' + callbackName + '&mode=view';
                 
                 script.onerror = function() {
                     clearTimeout(timeout);
